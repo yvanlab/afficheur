@@ -11,7 +11,7 @@
 #include "Arduino.h"
 #include "WProgram.h"
 #endif
-
+#include <time.h>
 #include "FastLED.h"
 #include "doubleDigit.h"
 #include "points.h"

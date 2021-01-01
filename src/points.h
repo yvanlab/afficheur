@@ -23,7 +23,7 @@ class Points  : public DisplayElement
     }
 
     void display() {
-        for (uint8_t i; i<getNbPixels(); i++) {
+        for (uint8_t i=0; i<getNbPixels(); i++) {
             m_firstPixel[i] = m_color;
         }
     };

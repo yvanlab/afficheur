@@ -36,7 +36,7 @@ class DoubleDigit : public DisplayElement
   public:
     DoubleDigit(CRGB *firstPixel) : DisplayElement(firstPixel) {
         m_digits[DIZAINE] = new Digit(firstPixel);
-        m_digits[UNITE] = new Digit(firstPixel+m_digits[0]->getNbPixels()*sizeof(CRGB));
+        m_digits[UNITE] = new Digit(&firstPixel[Digit::getNbPixels()]);
     };
 
     void displayValue(uint8_t value) {

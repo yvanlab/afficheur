@@ -35,22 +35,30 @@ public:
   Digit(CRGB *firstPixel) : DisplayElement(firstPixel)  {
     CRGB *nextPixel = firstPixel;
     for (uint s=0; s<7 ; s++) {
+      Serial.printf("Seg[%d] : ",s);
       m_seg[s] = new Segment(nextPixel);
-      nextPixel = nextPixel + Segment::getNbPixels()*sizeof(CRGB);
-      m_color = CRGB(255,0,0);
+      nextPixel = &nextPixel[Segment::getNbPixels()] ;
+      Serial.println();
     }
+    m_color = CRGB(255,0,0);
+   
   };
 
   
   void displayValue(uint8_t value){
+    Serial.printf("displayValue[%d]\n",value);
     uint8_t mask = 0x00000001;
     for (uint8_t i=0 ; i<7;i++) {
-      if (digitMapping[value]  &  mask) {
+      //Serial.printf("MASK[%x][%x]",mask,digitMapping[value]);
+      if ((digitMapping[value]  &  mask) != 0) {
         m_seg[i]->setColor(m_color);
+        //Serial.printf("Seg[%d]:D]",i);
       } else {
         m_seg[i]->setColor(CRGB(0,0,0));
+        //Serial.printf("Seg[%d]:N]",i);
       }
       m_seg[i]->display();
+      Serial.println();
       mask = mask << 1;
     }
 
@@ -64,16 +72,16 @@ private:
   Segment *m_seg[7];
   //CRGB m_color ={255,0,0};
   const uint8_t digitMapping[10] = {
-      (uint8_t)0x01011111, //0
-      (uint8_t)0x00110000, //1
-      (uint8_t)0x00111011, //2
-      (uint8_t)0x01111001, //3
-      (uint8_t)0x01100010, //4
-      (uint8_t)0x01101100, //5
-      (uint8_t)0x01101111, //6
-      (uint8_t)0x01011000, //7
-      (uint8_t)0x01111111, //8
-      (uint8_t)0x01111101  //9
+      0b01011111, //0
+      0b01010000, //1
+      0b00111011, //2
+      0b01111001, //3
+      0b01100100, //4
+      0b01101101, //5
+      0b01101111, //6
+      0b01011000, //7
+      0b01111111, //8
+      0b01111101  //9
   };
 };
 

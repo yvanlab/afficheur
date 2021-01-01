@@ -1,6 +1,9 @@
 #include "FastLED.h"
-#include <baseManager.h>
+//#include <baseManager.h>
 #include "afficheur.h"
+#include "digit.h"
+#include "doubleDigit.h"
+#include "points.h"
 
 
 
@@ -16,13 +19,15 @@
 //#define CLK_PIN   4
 #define LED_TYPE    SK6812
 #define COLOR_ORDER RGB
-#define NUM_LEDS    21
+#define NUM_LEDS    65
 #define BRIGHTNESS  255
 
 CRGB leds[NUM_LEDS];
 //Afficheur aff(leds);
 
-
+Digit *d;
+DoubleDigit *dd;
+Points *p;
 
 // This function draws rainbows with an ever-changing,
 // widely-varying set of parameters.
@@ -73,8 +78,8 @@ void setup() {
 
   Serial.begin(115200); //delay(500);
 	Serial.println("start debuging");
-	DEBUGLOGF("Frq : %d \n", ESP.getCpuFreqMHz());
-	DEBUGLOGF("Temp : %f \n", temperatureRead());
+	/*DEBUGLOGF("Frq : %d \n", ESP.getCpuFreqMHz());
+	DEBUGLOGF("Temp : %f \n", temperatureRead());*/
 
   
   // tell FastLED about the LED strip configuration
@@ -85,12 +90,21 @@ void setup() {
   // set master brightness control
   FastLED.setBrightness(BRIGHTNESS);
 
-
+  for (uint8_t i=0; i<NUM_LEDS; i++) {
+    leds[i].red = i;
+  }
+  FastLED.show(); 
+  dd = new DoubleDigit(leds);
+  p = new Points(&leds[DoubleDigit::getNbPixels()]);
 }
 
 #ifdef MCPOC_TEST
 uint8_t iLed = 0;
-CRGB color = CRGB(255,0,0);
+uint8_t iValue = 0;
+uint8_t iColor = 0;
+uint8_t iPoint = 0;
+CRGB cc[] = {CRGB(255,0,0),CRGB(0,255,0),CRGB(0,0,255),CRGB(0,255,255),CRGB(255,0,255),CRGB(255,255,0),CRGB(255,255,255),CRGB(50,50,50)};
+
 #endif
 
 void loop()
@@ -103,17 +117,17 @@ void loop()
 		Serial.print(c);
 		if (c == 'n')
 		{
-      if (iLed<NUM_LEDS) {
-        iLed++;
-      }
-			leds[iLed] = color;
+      iLed++;
+      iLed = iLed % NUM_LEDS;
+			leds[iLed] = CRGB(255,0,0);
       FastLED.show();  
 		}
 		else if (c == 'a')
 		{
       for (uint8_t i=0;i<NUM_LEDS; i++) {
-        leds[i] = CRGB(255,255,255);     
+        leds[i] = cc[iColor%8];     
       }
+      iColor ++;
       FastLED.show();  
 		
 		}
@@ -125,11 +139,33 @@ void loop()
       iLed = 0;
       FastLED.show();  		
 		}
+     else if (c == 'v')
+		{
+      dd->setColor(CRGB(0,0,255));
+      Serial.printf("value[%d]\n",iValue%100);
+      dd->displayValue(iValue%100);
+      iValue++;
+      FastLED.show();  		
+		}
+
+    else if (c == 'p')
+		{
+      if (iPoint) {
+        p->setColor(CRGB(0,0,0));
+        iPoint = 0;
+     }else {
+        iPoint = 1;
+        p->setColor(CRGB(0,255,0));
+     }
+      p->display();
+      FastLED.show();  		
+		}
+
 		
 	}
   #endif
   //pride();
-  for (uint8_t i=0;i<NUM_LEDS; i++) {
+  /*for (uint8_t i=0;i<NUM_LEDS; i++) {
     leds[i] = CRGB(255,255,255);
     delay(500); 
     FastLED.show();  
@@ -145,7 +181,7 @@ void loop()
     delay(500);
     FastLED.show();
   }
-  leds[NUM_LEDS-1] = CRGB(0,0,0);
+  leds[NUM_LEDS-1] = CRGB(0,0,0);*/
 
   //aff.displayValue(now());
 
