@@ -15,6 +15,7 @@
 #include "FastLED.h"
 #include "displayElement.h"
 
+
 /*
 struct MY_CRGB {
   CRGB crgb;
@@ -22,24 +23,24 @@ struct MY_CRGB {
 }
 */
 
+
 class Segment : public DisplayElement
 {
   public:
-    Segment(CRGB *firstPixel) : DisplayElement(firstPixel) {
+    Segment(CRGB *firstPixel) : DisplayElement(firstPixel,3) {
+      className = __func__;
       for (uint8_t i=0; i<3;i++) {
         Serial.printf("Pixel[%d]",firstPixel[i].red);
       }
     }
 
-    void display() {
+    /*void display() {
         for (uint8_t i=0; i<getNbPixels(); i++) {
             m_firstPixel[i] = m_color;
         }
-    };
+    };*/
 
-    static uint8_t getNbPixels() {
-      return 3;
-    }
+   
 
 };
 

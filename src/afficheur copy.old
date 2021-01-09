@@ -16,7 +16,6 @@
 #include "displayElement.h"
 #include "doubleDigit.h"
 #include "points.h"
-#include "manageElements.h"
 
 /*
             HEURE         POINT_HR       MINUTE      POINT_MN       SECONDE
@@ -38,7 +37,7 @@
 #define SECONDE 4
 */
 
-class Afficheur : public ManageElements
+class Afficheur : public DisplayElement
 {
 public:
     enum AFFICHEUR_ELT
@@ -46,28 +45,24 @@ public:
         HOUR = 0,
         POINT_HR = 1,
         MINUTE = 2,
-        /*POINT_MN=3, SECONDE=4,*/ LAST_AFFICHEUR_ELT = 3
+        /*POINT_MN=3, SECONDE=4,*/ LAST_ELT = 3
     };
-    Afficheur(CRGB *firstPixel) 
+    Afficheur(CRGB *firstPixel) : DisplayElement(firstPixel, 86)
     {
         className = __func__;
-        
-        //m_elt = new DisplayElement[LAST_AFFICHEUR_ELT];
-        m_nbElts = LAST_AFFICHEUR_ELT;
         CRGB *nextPixel = firstPixel;
         m_elt[HOUR] = new DoubleDigit(nextPixel);
         nextPixel = &nextPixel[m_elt[HOUR]->getNbPixels()];
         m_elt[POINT_HR] = new Points(nextPixel);
         nextPixel = &nextPixel[m_elt[POINT_HR]->getNbPixels()];
         m_elt[MINUTE] = new DoubleDigit(nextPixel);
-        //Afficheur::init(m_elt,(int8_t)LAST_ELT);
         /*nextPixel += m_minute->getNbPixels() * sizeof(CRGB);
         m_point_minute = new Points(nextPixel);
         nextPixel += m_point_minute->getNbPixels() * sizeof(CRGB);
         m_seconde = new DoubleDigit(nextPixel);*/
     };
 
-    /*void setValue(uint8_t iValue, AFFICHEUR_ELT elt)
+    void setValue(uint8_t iValue, AFFICHEUR_ELT elt)
     {
         m_elt[(uint8_t)elt]->setValue(iValue);
     };
@@ -141,14 +136,14 @@ public:
             m_elt[(uint8_t)elt]->setState(bON);
         }
     }
-*/
+
 private:
-    //DisplayElement *m_elt[AFFICHEUR_ELT::LAST_ELT];
-  //  DoubleDigit *m_hour;
-  //  Points *m_point_hour;
-  //  DoubleDigit *m_minute;
-  //  Points *m_point_minute;
-  //  DoubleDigit *m_seconde;
+    DisplayElement *m_elt[AFFICHEUR_ELT::LAST_ELT];
+    DoubleDigit *m_hour;
+    Points *m_point_hour;
+    DoubleDigit *m_minute;
+    Points *m_point_minute;
+    DoubleDigit *m_seconde;
 };
 
 #endif

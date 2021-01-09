@@ -14,6 +14,7 @@
 
 #include "FastLED.h"
 #include "digit.h"
+#include "manageElements.h"
 
 /*
          1            2
@@ -28,36 +29,55 @@
 
 */
 
-#define DIZAINE 0
-#define UNITE 1
+/*#define DIZAINE 0
+#define UNITE 1*/
 
-class DoubleDigit : public DisplayElement
+class DoubleDigit : public DisplayElement, public ManageElements
 {
   public:
-    DoubleDigit(CRGB *firstPixel) : DisplayElement(firstPixel) {
-        m_digits[DIZAINE] = new Digit(firstPixel);
-        m_digits[UNITE] = new Digit(&firstPixel[Digit::getNbPixels()]);
+    enum DIGIT {DIZAINE=0, UNITE=1, LAST_DIGIT_ELT=2 };
+    DoubleDigit(CRGB *firstPixel)  {
+        //className = __func__;
+        m_elt[DIZAINE] = new Digit(firstPixel);
+        m_elt[UNITE] = new Digit(&firstPixel[m_elt[DIZAINE]->getNbPixels()]);
+        m_nbElts = 2;
+        //init(m_elt,LAST_DIGIT_ELT);
     };
 
-    void displayValue(uint8_t value) {
-      uint8_t dizaine = value / 10;
-      uint8_t unite = value % 10;
-      m_digits[DIZAINE]->displayValue(dizaine); 
-      m_digits[UNITE]->displayValue(unite);
+    void setValue(uint8_t iValue, int8_t iElt = -1){
+      uint8_t dizaine = iValue / 10;
+      uint8_t unite = iValue % 10;
+      ManageElements::setValue(dizaine, DIZAINE);
+      ManageElements::setValue(unite, UNITE);
+      /*m_elt[DIZAINE]->setValue(dizaine); 
+      m_elt[UNITE]->setValue(unite);*/
 
     };
 
-    void setColor(CRGB newcolor) {
-      m_digits[DIZAINE]->setColor(newcolor); 
-      m_digits[UNITE]->setColor(newcolor); 
-    };
+    /*void  setState(boolean bON) {
+      m_elt[DIZAINE]->setState(bON);
+      m_elt[UNITE]->setState(bON);  
+    }
     
-    static uint8_t getNbPixels() {
-      return  2*Digit::getNbPixels();
+    void HandleMode() {
+      m_elt[DIZAINE]->HandleMode();
+      m_elt[UNITE]->HandleMode();
     }
 
+    void setMode(MODE_LED mode){
+       m_elt[DIZAINE]->setMode(mode);
+        m_elt[UNITE]->setMode(mode);
+    };
+*/
+
+    /*void setColor(CRGB newcolor) {
+      m_elt[DIZAINE]->setColor(newcolor); 
+      m_elt[UNITE]->setColor(newcolor); 
+    };*/
+  
+
   private:
-    Digit *m_digits[2];
+  //  Digit *m_elt[2];
 };
 
 

@@ -30,43 +30,55 @@
 class Digit : public DisplayElement
 {
 public:
-
   //
-  Digit(CRGB *firstPixel) : DisplayElement(firstPixel)  {
+  Digit(CRGB *firstPixel) : DisplayElement(firstPixel, 7 * 3)
+  {
+    className = __func__;
     CRGB *nextPixel = firstPixel;
-    for (uint s=0; s<7 ; s++) {
-      Serial.printf("Seg[%d] : ",s);
+    for (uint s = 0; s < 7; s++)
+    {
+      Serial.printf("Seg[%d] : ", s);
       m_seg[s] = new Segment(nextPixel);
-      nextPixel = &nextPixel[Segment::getNbPixels()] ;
+      nextPixel = &nextPixel[m_seg[s]->getNbPixels()];
       Serial.println();
     }
-    m_color = CRGB(255,0,0);
-   
   };
 
-  
-  void displayValue(uint8_t value){
-    Serial.printf("displayValue[%d]\n",value);
+  void setValue(uint8_t value)
+  {
+    DEBUGLOGF("setValue[%d]\n", value);
     uint8_t mask = 0x00000001;
-    for (uint8_t i=0 ; i<7;i++) {
+    for (uint8_t i = 0; i < 7; i++)
+    {
       //Serial.printf("MASK[%x][%x]",mask,digitMapping[value]);
-      if ((digitMapping[value]  &  mask) != 0) {
-        m_seg[i]->setColor(m_color);
-        //Serial.printf("Seg[%d]:D]",i);
-      } else {
-        m_seg[i]->setColor(CRGB(0,0,0));
-        //Serial.printf("Seg[%d]:N]",i);
-      }
-      m_seg[i]->display();
-      Serial.println();
+      m_seg[i]->setState(((digitMapping[value] & mask) != 0));
       mask = mask << 1;
     }
-
-  };
-
-  static uint8_t getNbPixels() {
-    return  7*Segment::getNbPixels();
   }
+
+  void setState(boolean bON)
+  {
+    for (uint8_t i = 0; i < 7; i++)
+    {
+      m_seg[i]->setState(bON);
+    }
+  }
+
+  void HandleMode()
+  {
+    for (uint8_t i = 0; i < 7; i++)
+    {
+      m_seg[i]->HandleMode();
+    }
+  }
+
+  void setMode(MODE_LED mode)
+  {
+    for (uint8_t i = 0; i < 7; i++)
+    {
+      m_seg[i]->setMode(mode);
+    }
+  };
 
 private:
   Segment *m_seg[7];

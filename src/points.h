@@ -14,25 +14,19 @@
 
 #include "FastLED.h"
 
-
-class Points  : public DisplayElement
+class Points : public DisplayElement
 {
-  public:
-    Points(CRGB *firstPixel) : DisplayElement(firstPixel) {
-       
+public:
+  Points(CRGB *firstPixel) : DisplayElement(firstPixel, 2)
+  {
+    className = __func__;
+    Serial.print("Points : ");
+    for (uint8_t i = 0; i < 2; i++)
+    {
+      Serial.printf("Pixel[%d]", firstPixel[i].red);
     }
-
-    void display() {
-        for (uint8_t i=0; i<getNbPixels(); i++) {
-            m_firstPixel[i] = m_color;
-        }
-    };
-
-    static uint8_t getNbPixels() {
-      return 2;
-    }
-
+    Serial.println();
+  }
 };
-
 
 #endif

@@ -32,6 +32,10 @@
 *.out
 *.app
 
+.pio/build/project.checksum
+.pio/build/esp32doit-devkit-v1/.sconsign37.dblite
+.pio/build/esp32doit-devkit-v1/partitions.bin
+
 .pio
 .pioenvs
 .piolibdeps
@@ -55,3 +59,14 @@
 .vscode/launch.json
 .vscode/launch.json
 .vscode/c_cpp_properties.json
+
+.pio/build/project.checksum
+.pio/build/esp32doit-devkit-v1/.sconsign37.dblite
+.pio/build/esp32doit-devkit-v1/partitions.bin
+.pio/build/project.checksum
+.pio/build/esp32doit-devkit-v1/.sconsign37.dblite
+.pio/build/esp32doit-devkit-v1/partitions.bin
+.vscode/c_cpp_properties.json
+.pio/build/project.checksum
+.pio/build/esp32doit-devkit-v1/.sconsign37.dblite
+.pio/build/esp32doit-devkit-v1/partitions.bin
