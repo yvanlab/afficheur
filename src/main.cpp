@@ -5,15 +5,9 @@
 #include <HTTPClient.h>
 #include "main.h"
 //#include <baseManager.h>
-#include "afficheur.h"
-#include "digit.h"
-#include "doubleDigit.h"
-#include "points.h"
-#include <sdkconfig.h>
+#include "displayHour.h"
+#include "displayBase.h"
 
-// Pride2015
-// Animated, ever-changing rainbows.
-// by Mark Kriegsman
 
 #if FASTLED_VERSION < 3001000
 #error "Requires FastLED 3.1 or later; check github for latest code."
@@ -29,10 +23,7 @@
 CRGB leds[NUM_LEDS];
 //Afficheur aff(leds);
 
-/*Digit *d;
-DoubleDigit *dd;
-Points *p;*/
-Afficheur *aff;
+DisplayHour *aff;
 portMUX_TYPE wtimerMux = portMUX_INITIALIZER_UNLOCKED;
 // This function draws rainbows with an ever-changing,
 // widely-varying set of parameters.
@@ -101,12 +92,11 @@ void setup()
     leds[i].red = i;
   }
   FastLED.show();
-  aff = new Afficheur(leds);
+  aff = new DisplayHour(leds);
+  //aff->add(leds);
   /*dd = new DoubleDigit(leds);
   p = new Points(&leds[dd->getNbPixels()]);*/
   //ddd = new DoubleDigit(&leds[dd->getNbPixels()+p->getNbPixels()]);
-
-  
 
   mtTimer.begin(timerFrequence);
   mtTimer.setCustomMS(25);
@@ -160,9 +150,10 @@ void loop()
     else if (c == 'v')
     {
       aff->setColorON(CRGB(0, 0, 255));
+      aff->setColorOFF(CRGB(0, 255, 255));
       Serial.printf("value[%d]\n", iValue % 100);
-      aff->setValue(iValue % 100, Afficheur::HOUR);
-      aff->setValue(iValue % 100, Afficheur::MINUTE);
+      aff->setValue(iValue % 100, DisplayHour::HOUR);
+      aff->setValue(iValue % 100, DisplayHour::MINUTE);
      
       //aff->display(true, Afficheur::LAST_ELT);
       iValue++;
@@ -171,22 +162,24 @@ void loop()
 
     else if (c == 'p')
     {
-      aff->setValue(iPoint % 2, Afficheur::POINT_HR);
-      aff->HandleMode();
+      aff->setValue(iPoint, DisplayHour::POINT_HR);
+      aff->handleMode();
       iPoint++;
       FastLED.show();
     }
     else if (c == 'm')
     {
-      aff->setMode((DisplayElement::MODE_LED)(iMode % 4));
+      aff->setMode((DisplayBase::MODE_LED)(iMode % 4));
       iMode++;
       FastLED.show();
     }
   }
-   aff->HandleMode();
+   aff->handleMode();
   FastLED.show();
 
 #endif
+}
+
   //pride();
   /*for (uint8_t i=0;i<NUM_LEDS; i++) {
     leds[i] = CRGB(255,255,255);
@@ -207,4 +200,4 @@ void loop()
   leds[NUM_LEDS-1] = CRGB(0,0,0);*/
 
   //aff.displayValue(now());
-}
+

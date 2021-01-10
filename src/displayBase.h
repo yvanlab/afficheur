@@ -1,7 +1,7 @@
 
 
-#ifndef DisplayElement_h
-#define DisplayElement_h
+#ifndef DisplayBase_h
+#define DisplayBase_h
 
 #if defined(ARDUINO) && ARDUINO >= 100
 
@@ -16,7 +16,7 @@
 #include "delayHelper.h"
 #include <myTimer.h>
 
-class DisplayElement
+class DisplayBase
 {
 public:
   enum MODE_LED
@@ -26,35 +26,37 @@ public:
     PSYCHEDELIC = 2,
     K2000 = 3
   };
-  DisplayElement()
+ 
+  DisplayBase()
   {
-
-  }
-
-
-  DisplayElement(CRGB *firstPixel, uint8_t nbLeds)
-  {
-    m_firstPixel = firstPixel;
-    m_nbLeds = nbLeds;
     m_mode = MODE_LED::STATIC;
+    m_nbLeds = 1;
   }
 
-  void setMode(MODE_LED mode)
+  DisplayBase(CRGB *firstPixel)
+  {
+    m_mode = MODE_LED::STATIC;
+    m_nbLeds = 1;
+    m_firstPixel = firstPixel;
+  }
+
+  virtual void setMode(MODE_LED mode)
   {
     m_mode = mode;
   };
 
-  void setColorON(CRGB newcolor)
+  virtual void setColorON(CRGB newcolor)
   {
+    //DEBUGLOGF("setColorON - %s \n",className);
     m_colorON = newcolor;
   };
 
-  void setColorOFF(CRGB newcolor)
+  virtual void setColorOFF(CRGB newcolor)
   {
     m_colorOFF = newcolor;
   };
 
-  void setState(boolean bON)
+  virtual void setState(boolean bON)
   {
     m_isOn = bON;
   };
@@ -65,10 +67,15 @@ public:
 
   void display(boolean bON)
   {
-    if (bON && m_isOn)
-      display(m_colorON);
-    else
-      display(m_colorOFF);
+    if (m_isOn)  {
+      if (bON )
+        display(m_colorON);
+      else
+        display(m_colorOFF);
+    } else
+      display(m_colorSTOP);
+      
+
   };
 
   void display(CRGB color)
@@ -79,7 +86,7 @@ public:
     }
   };
 
-  virtual void HandleMode()
+  virtual void handleMode()
   {
     //DEBUGLOGF("Mode [%d]\n", m_mode);
     if (m_mode == MODE_LED::STATIC)
@@ -147,9 +154,9 @@ public:
     }
   }
 
-  uint8_t getNbPixels()
+  static uint8_t getNbPixels() 
   {
-    return m_nbLeds;
+    return 1;
   }
 
   const char* getClassName() {
@@ -160,6 +167,7 @@ protected:
   CRGB *m_firstPixel;
   CRGB m_colorON = {255, 0, 0};
   CRGB m_colorOFF = {0, 0, 0};
+  const CRGB m_colorSTOP = {0,0,0};
   uint8_t m_nbLeds;
   MODE_LED m_mode = MODE_LED::STATIC;
   boolean m_isOn = false;
