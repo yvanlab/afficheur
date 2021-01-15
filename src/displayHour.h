@@ -30,6 +30,14 @@
 
 */
 
+#define DATA_PIN 2
+//#define CLK_PIN   4
+#define LED_TYPE SK6812
+#define COLOR_ORDER RGB
+#define NUM_LEDS 86
+#define BRIGHTNESS 255
+
+
 class DisplayHour : public DisplayComponent
 {
 public:
@@ -77,6 +85,10 @@ public:
     {
         m_listComponent[(uint8_t)elt]->setValue(iValue);
     };
+
+public:
+    CRGB m_leds[NUM_LEDS];
+
 };
 
 #endif
