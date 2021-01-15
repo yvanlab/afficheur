@@ -17,7 +17,7 @@
 //#define CLK_PIN   4
 #define LED_TYPE SK6812
 #define COLOR_ORDER RGB
-#define NUM_LEDS 86
+#define NUM_LEDS 21+21+2+21+21+2+21+21
 #define BRIGHTNESS 255
 
 CRGB leds[NUM_LEDS];
@@ -149,11 +149,12 @@ void loop()
     }
     else if (c == 'v')
     {
-      aff->setColorON(CRGB(0, 0, 255));
+      //aff->setColorON(CRGB(0, 0, 255));
       aff->setColorOFF(CRGB(0, 255, 255));
       Serial.printf("value[%d]\n", iValue % 100);
       aff->setValue(iValue % 100, DisplayHour::HOUR);
       aff->setValue(iValue % 100, DisplayHour::MINUTE);
+
      
       //aff->display(true, Afficheur::LAST_ELT);
       iValue++;
@@ -163,6 +164,7 @@ void loop()
     else if (c == 'p')
     {
       aff->setValue(iPoint, DisplayHour::POINT_HR);
+      aff->setValue(iPoint, DisplayHour::POINT_MN);
       aff->handleMode();
       iPoint++;
       FastLED.show();
@@ -174,7 +176,18 @@ void loop()
       FastLED.show();
     }
   }
-   aff->handleMode();
+  if (mtTimer.is1SPeriod()) {
+    uint8_t ss = second(now());
+    aff->setColorON(CRGB(255, 255, 255), DisplayHour::POINT_HR);
+    aff->setColorON(CRGB(255, 255, 255), DisplayHour::POINT_MN);
+    aff->setValue(ss%2, DisplayHour::POINT_HR);
+    aff->setValue(ss%2, DisplayHour::POINT_MN);
+    aff->setValue(hour(now()), DisplayHour::HOUR);
+    aff->setValue(minute(now()), DisplayHour::MINUTE);
+    aff->setValue(ss, DisplayHour::SECONDE);
+
+  }
+  aff->handleMode();
   FastLED.show();
 
 #endif

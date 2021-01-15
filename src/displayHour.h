@@ -38,7 +38,9 @@ public:
         HOUR = 0,
         POINT_HR = 1,
         MINUTE = 2,
-        /*POINT_MN=3, SECONDE=4,*/ LAST_HOUR_ELT = 3
+        POINT_MN=3, 
+        SECONDE=4,
+        LAST_HOUR_ELT = 3
     };
 
     DisplayHour(CRGB *firstPixel) : DisplayComponent(firstPixel)
@@ -65,18 +67,36 @@ public:
         CRGB *nextPixel = firstPixel;
         DEBUGLOG("DisplayDoubleDigit");
         m_listComponent.push_back(new DisplayDoubleDigit(nextPixel));
-        nextPixel = &nextPixel[DisplayDoubleDigit::getNbPixels()];
+        
         DEBUGLOG("DisplayPoints");
+        nextPixel = &nextPixel[DisplayDoubleDigit::getNbPixels()];
         m_listComponent.push_back(new DisplayPoints(nextPixel));
-        nextPixel = &nextPixel[DisplayPoints::getNbPixels()];
+        
         DEBUGLOG("DisplayDoubleDigit");
+        nextPixel = &nextPixel[DisplayPoints::getNbPixels()];
         m_listComponent.push_back(new DisplayDoubleDigit(nextPixel));
+        
+        DEBUGLOG("DisplayPoints");
+        nextPixel = &nextPixel[DisplayDoubleDigit::getNbPixels()];
+        m_listComponent.push_back(new DisplayPoints(nextPixel));
+
+        DEBUGLOG("DisplayDoubleDigit");
+        nextPixel = &nextPixel[DisplayPoints::getNbPixels()];
+        m_listComponent.push_back(new DisplayDoubleDigit(nextPixel));
+
+
     }
 
     void setValue(uint8_t iValue, HOUR_ELT elt)
     {
         m_listComponent[(uint8_t)elt]->setValue(iValue);
     };
+
+    void setColorON(CRGB iValue, HOUR_ELT elt)
+    {
+        m_listComponent[(uint8_t)elt]->setColorON(iValue);
+    };
+
 };
 
 #endif
