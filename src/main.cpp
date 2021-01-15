@@ -20,7 +20,7 @@
 #define NUM_LEDS 86
 #define BRIGHTNESS 255
 
-CRGB leds[NUM_LEDS];
+//CRGB leds[NUM_LEDS];
 //Afficheur aff(leds);
 
 DisplayHour *aff;
