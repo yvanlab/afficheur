@@ -9,6 +9,7 @@
 #include <myTimer.h>
 #include "settingManager.h"
 #include "networkUI.h"
+//#include "displayHour.h"
 //#include <FlashLED.h>
 
 
@@ -24,6 +25,7 @@
 
 extern SettingManager     *smManager;
 extern WifiManager        *wfManager;
+//extern DislayHour         *affManager;
 
 
 

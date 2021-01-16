@@ -64,13 +64,13 @@ public:
     }
   }
 
-  void setValue(uint8_t value)
+  virtual void setValue(uint8_t value , int8_t iSelected = -1)
   {
     DEBUGLOGF("setValue[%d]\n", value);
     uint8_t dizaine = value / 10;
     uint8_t unite = value % 10;
-    m_listComponent[DIZAINE]->setValue(dizaine);
-    m_listComponent[UNITE]->setValue(unite);
+    m_listComponent[DIZAINE]->setValue(dizaine, iSelected);
+    m_listComponent[UNITE]->setValue(unite,iSelected);
   }
 
 private:

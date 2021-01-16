@@ -17,6 +17,7 @@
 #include <EEPROM.h>
 #include <baseManager.h>
 #include <BaseSettingManager.h>
+#include <pixeltypes.h>
 //#include "matrixPages.h"
 
 
@@ -37,7 +38,7 @@ public:
 	String toString(boolean bJson);
 	String toStringCfg(boolean bJson);
 
-	String m_mainColor;
+	CRGB m_mainColor;
 	String m_mainAnnimation;
 
 };

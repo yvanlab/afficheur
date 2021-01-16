@@ -106,15 +106,7 @@ public:
         m_listComponent.push_back(new DisplayDoubleDigit(nextPixel));
     }
 
-    void nsetValue(uint8_t iValue, HOUR_ELT elt)
-    {
-        m_listComponent[(uint8_t)elt]->setValue(iValue);
-    };
 
-    void setColorON(CRGB iValue, HOUR_ELT elt)
-    {
-        m_listComponent[(uint8_t)elt]->setColorON(iValue);
-    };
 
 public:
     CRGB m_leds[NUM_LEDS];

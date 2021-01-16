@@ -77,15 +77,15 @@ void setData()
 #endif
 
 	String str;
-/*	if ((str = wfManager->getServer()->arg("freq")) != NULL)
+	if ((str = wfManager->getServer()->arg("mainColor")) != NULL)
 	{
-		smManager->displayedFrequence = (uint8_t)atoi(str.c_str());
+		smManager->m_mainColor = str;
 	}
-	else if ((str = wfManager->getServer()->arg("def")) != NULL)
+	else if ((str = wfManager->getServer()->arg("mainAnnimation")) != NULL)
 	{
-		smManager->displayedMode = str == "true";
+		smManager->m_mainAnnimation = str;
 	}
-	else if (wfManager->getServer()->hasArg("prgHour") || wfManager->getServer()->hasArg("prgPage") || wfManager->getServer()->hasArg("prgDuration") )
+/*	else if (wfManager->getServer()->hasArg("prgHour") || wfManager->getServer()->hasArg("prgPage") || wfManager->getServer()->hasArg("prgDuration") )
 	{
 		changed = manageProg();
 	}

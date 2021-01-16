@@ -38,7 +38,7 @@ public:
   }
 
 
-  virtual void setValue(uint8_t value)
+  virtual void setValue(uint8_t value, int8_t iSelected)
   {
     //DEBUGLOGF("setValue[%d]\n", value);
     std::vector<DisplayBase *>::const_iterator itb = m_listComponent.begin();
@@ -46,7 +46,7 @@ public:
     uint8_t mask = 0b00000001;
     for (; itb != ite; itb++)
     {
-      (*itb)->setState(((value & mask) != 0));
+      (*itb)->setState(((value & mask) != 0), iSelected);
       mask = mask << 1;
     }
   }

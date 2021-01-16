@@ -58,7 +58,7 @@ public:
     }
   }
 
-  void setValue(uint8_t value)
+  virtual void setValue(uint8_t value, int8_t iSelected = -1)
   {
     DEBUGLOGF("setValue[%d]\n", value);
     uint8_t mask = 0x00000001;
@@ -68,9 +68,9 @@ public:
     for (; itb != ite; itb++)
     {
       if ((DisplayDigitMapping[value] & mask) != 0)
-        (*itb)->setValue(255);
+        (*itb)->setValue(255, iSelected);
       else
-        (*itb)->setValue(0);
+        (*itb)->setValue(0, iSelected);
       mask = mask << 1;
     }
   }

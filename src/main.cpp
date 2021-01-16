@@ -20,7 +20,7 @@
 
 SettingManager  *smManager; //(PIN_LED);
 WifiManager     *wfManager;	   //(PIN_LED, &smManager);
-DisplayHour     *aff;
+DisplayHour     *affManager;
 CRGB *leds;
 portMUX_TYPE wtimerMux = portMUX_INITIALIZER_UNLOCKED;
 // This function draws rainbows with an ever-changing,
@@ -79,6 +79,7 @@ void startWiFiserver()
 	wfManager->getServer()->on("/status", dataJson);
 	wfManager->getServer()->on("/setData", setData);
 	wfManager->getServer()->on("/config", configPage);
+  wfManager->getServer()->on("/save", saveConfiguration);  
 
 #ifdef OTA_FOR_ATOM
 	ArduinoOTA.onStart(OTAOnStart);
@@ -103,8 +104,8 @@ void setup()
   smManager = new SettingManager(PIN_LED);
 	wfManager = new WifiManager(PIN_LED, smManager);
 
-  aff = new DisplayHour();
-  leds = aff->getLeds();
+  affManager = new DisplayHour();
+  leds = affManager->getLeds();
 
 	if (!SPIFFS.begin(true))
 	{
@@ -137,6 +138,8 @@ CRGB cc[] = {CRGB(255, 0, 0), CRGB(0, 255, 0), CRGB(0, 0, 255), CRGB(0, 255, 255
 void loop()
 {
 wfManager->handleClient();
+
+
 #ifdef MCPOC_TEST
   if (Serial.available())
   {
@@ -164,41 +167,41 @@ wfManager->handleClient();
       {
         leds[i] = CRGB(0, 0, 0);
       }
-      aff->setState(false);
+      affManager->setState(false);
       //p->setState(false);
       iLed = 0;
       FastLED.show();
     }
     else if (c == 'v')
     {
-      //aff->setColorON(CRGB(0, 0, 255));
-      aff->setColorOFF(CRGB(0, 255, 255));
+      //affManager->setColorON(CRGB(0, 0, 255));
+      affManager->setColorOFF(CRGB(0, 255, 255));
       Serial.printf("value[%d]\n", iValue % 100);
-      aff->setValue(iValue % 100, DisplayHour::HOUR);
-      aff->setValue(iValue % 100, DisplayHour::MINUTE);
-      aff->setValue(iValue % 100, DisplayHour::SECONDE);
+      affManager->setValue(iValue % 100, DisplayHour::HOUR);
+      affManager->setValue(iValue % 100, DisplayHour::MINUTE);
+      affManager->setValue(iValue % 100, DisplayHour::SECONDE);
      
-      //aff->display(true, Afficheur::LAST_ELT);
+      //affManager->display(true, Afficheur::LAST_ELT);
       iValue++;
       FastLED.show();
     }
 
     else if (c == 'p')
     {
-      aff->setValue(iPoint, DisplayHour::POINT_HR);
-      aff->setValue(iPoint, DisplayHour::POINT_MN);
-      aff->handleMode();
+      affManager->setValue(iPoint, DisplayHour::POINT_HR);
+      affManager->setValue(iPoint, DisplayHour::POINT_MN);
+      affManager->handleMode();
       iPoint = iPoint ^ 255;
       FastLED.show();
     }
     else if (c == 'm')
     {
-      aff->setMode((DisplayBase::MODE_LED)(iMode % 4));
+      affManager->setMode((DisplayBase::MODE_LED)(iMode % 4));
       iMode++;
       FastLED.show();
     }
   }
-  aff->handleMode();
+  affManager->handleMode();
   FastLED.show();
 
 #endif
