@@ -13,17 +13,15 @@
 #error "Requires FastLED 3.1 or later; check github for latest code."
 #endif
 
-#define DATA_PIN 2
-//#define CLK_PIN   4
-#define LED_TYPE SK6812
-#define COLOR_ORDER RGB
-#define NUM_LEDS 86
-#define BRIGHTNESS 255
 
-//CRGB leds[NUM_LEDS];
+//#define NUM_LEDS 86
+
 //Afficheur aff(leds);
 
-DisplayHour *aff;
+SettingManager  *smManager; //(PIN_LED);
+WifiManager     *wfManager;	   //(PIN_LED, &smManager);
+DisplayHour     *aff;
+CRGB *leds;
 portMUX_TYPE wtimerMux = portMUX_INITIALIZER_UNLOCKED;
 // This function draws rainbows with an ever-changing,
 // widely-varying set of parameters.
@@ -69,34 +67,58 @@ void pride()
   }
 }
 
+
+void startWiFiserver()
+{
+	if (wfManager->begin(IPAddress(MODULE_IP), MODULE_NAME, MODULE_MDNS,
+						 MODULE_MDNS_AP) == WL_CONNECTED)
+	{
+/*		wfManager->getServer()->on("/", dataPage);
+		wfManager->getServer()->onNotFound(dataPage);*/
+	}
+	wfManager->getServer()->on("/status", dataJson);
+	wfManager->getServer()->on("/setData", setData);
+	wfManager->getServer()->on("/config", configPage);
+
+#ifdef OTA_FOR_ATOM
+	ArduinoOTA.onStart(OTAOnStart);
+#endif
+
+	Serial.println(wfManager->toString(STD_TEXT));
+}
+
+
+
 void setup()
 {
 
-  delay(3000); // 3 second delay for recovery
+  //delay(3000); // 3 second delay for recovery
 
   Serial.begin(115200); //delay(500);
   Serial.println("start debuging");
-  /*DEBUGLOGF("Frq : %d \n", ESP.getCpuFreqMHz());
-	DEBUGLOGF("Temp : %f \n", temperatureRead());*/
+  DEBUGLOGF("Frq : %d \n", ESP.getCpuFreqMHz());
+	DEBUGLOGF("Temp : %f \n", temperatureRead());
 
-  // tell FastLED about the LED strip configuration
-  FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS)
-      .setCorrection(TypicalLEDStrip)
-      .setDither(BRIGHTNESS < 255);
+  
+  smManager = new SettingManager(PIN_LED);
+	wfManager = new WifiManager(PIN_LED, smManager);
 
-  // set master brightness control
-  FastLED.setBrightness(BRIGHTNESS);
+  aff = new DisplayHour();
+  leds = aff->getLeds();
 
-  for (uint8_t i = 0; i < NUM_LEDS; i++)
-  {
-    leds[i].red = i;
-  }
-  FastLED.show();
-  aff = new DisplayHour(leds);
-  //aff->add(leds);
-  /*dd = new DoubleDigit(leds);
-  p = new Points(&leds[dd->getNbPixels()]);*/
-  //ddd = new DoubleDigit(&leds[dd->getNbPixels()+p->getNbPixels()]);
+	if (!SPIFFS.begin(true))
+	{
+		Serial.println("SPIFFS Mount Failed");
+		return;
+	}
+	else
+		Serial.println("SPIFFS Mount OK");
+
+	smManager->readData();
+	DEBUGLOG(smManager->toString(STD_TEXT));
+	startWiFiserver();
+
+  
 
   mtTimer.begin(timerFrequence);
   mtTimer.setCustomMS(25);
@@ -114,7 +136,7 @@ CRGB cc[] = {CRGB(255, 0, 0), CRGB(0, 255, 0), CRGB(0, 0, 255), CRGB(0, 255, 255
 
 void loop()
 {
-
+wfManager->handleClient();
 #ifdef MCPOC_TEST
   if (Serial.available())
   {
@@ -149,11 +171,12 @@ void loop()
     }
     else if (c == 'v')
     {
-      aff->setColorON(CRGB(0, 0, 255));
+      //aff->setColorON(CRGB(0, 0, 255));
       aff->setColorOFF(CRGB(0, 255, 255));
       Serial.printf("value[%d]\n", iValue % 100);
       aff->setValue(iValue % 100, DisplayHour::HOUR);
       aff->setValue(iValue % 100, DisplayHour::MINUTE);
+      aff->setValue(iValue % 100, DisplayHour::SECONDE);
      
       //aff->display(true, Afficheur::LAST_ELT);
       iValue++;
@@ -163,8 +186,9 @@ void loop()
     else if (c == 'p')
     {
       aff->setValue(iPoint, DisplayHour::POINT_HR);
+      aff->setValue(iPoint, DisplayHour::POINT_MN);
       aff->handleMode();
-      iPoint++;
+      iPoint = iPoint ^ 255;
       FastLED.show();
     }
     else if (c == 'm')
@@ -174,7 +198,7 @@ void loop()
       FastLED.show();
     }
   }
-   aff->handleMode();
+  aff->handleMode();
   FastLED.show();
 
 #endif

@@ -29,6 +29,14 @@
       *****         *****           *****       *****           ******      *****
 
 */
+#define NUM_LEDS 21+21+2+21+21+2+21+21
+#define DATA_PIN 2
+//#define CLK_PIN   4
+#define LED_TYPE SK6812
+#define COLOR_ORDER RGB
+
+#define BRIGHTNESS 255
+
 
 class DisplayHour : public DisplayComponent
 {
@@ -38,28 +46,41 @@ public:
         HOUR = 0,
         POINT_HR = 1,
         MINUTE = 2,
-        POINT_MN=3, 
-        SECONDE=4,
+        POINT_MN = 3,
+        SECONDE = 4,
         LAST_HOUR_ELT = 3
     };
 
-    DisplayHour(CRGB *firstPixel) : DisplayComponent(firstPixel)
+    DisplayHour() : DisplayComponent(m_leds)
     {
         className = __func__;
         m_nbLeds = DisplayHour::getNbPixels();
-        add(firstPixel);
-        //DisplayHour::init(m_elt,(int8_t)LAST_ELT);
-        /*nextPixel += m_minute->getNbPixels() * sizeof(CRGB);
-        m_point_minute = new Points(nextPixel);
-        nextPixel += m_point_minute->getNbPixels() * sizeof(CRGB);
-        m_seconde = new DoubleDigit(nextPixel);*/
+
+        FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(m_leds, NUM_LEDS)
+            .setCorrection(TypicalLEDStrip)
+            .setDither(BRIGHTNESS < 255);
+
+        // set master brightness control
+        FastLED.setBrightness(BRIGHTNESS);
+
+        for (uint8_t i = 0; i < NUM_LEDS; i++)
+        {
+            m_leds[i].red = i;
+        }
+        FastLED.show();
+
+        add(m_leds);
     };
 
-    static uint8_t getNbPixels() 
+    CRGB *getLeds()
     {
-        return DisplayDoubleDigit::getNbPixels()*2+DisplayPoints::getNbPixels();
+        return m_leds;
     }
 
+    static uint8_t getNbPixels()
+    {
+        return DisplayDoubleDigit::getNbPixels() * 2 + DisplayPoints::getNbPixels();
+    }
 
     virtual void add(CRGB *firstPixel)
     {
@@ -67,15 +88,7 @@ public:
         CRGB *nextPixel = firstPixel;
         DEBUGLOG("DisplayDoubleDigit");
         m_listComponent.push_back(new DisplayDoubleDigit(nextPixel));
-        
-        DEBUGLOG("DisplayPoints");
-        nextPixel = &nextPixel[DisplayDoubleDigit::getNbPixels()];
-        m_listComponent.push_back(new DisplayPoints(nextPixel));
-        
-        DEBUGLOG("DisplayDoubleDigit");
-        nextPixel = &nextPixel[DisplayPoints::getNbPixels()];
-        m_listComponent.push_back(new DisplayDoubleDigit(nextPixel));
-        
+
         DEBUGLOG("DisplayPoints");
         nextPixel = &nextPixel[DisplayDoubleDigit::getNbPixels()];
         m_listComponent.push_back(new DisplayPoints(nextPixel));
@@ -84,10 +97,16 @@ public:
         nextPixel = &nextPixel[DisplayPoints::getNbPixels()];
         m_listComponent.push_back(new DisplayDoubleDigit(nextPixel));
 
+        DEBUGLOG("DisplayPoints");
+        nextPixel = &nextPixel[DisplayDoubleDigit::getNbPixels()];
+        m_listComponent.push_back(new DisplayPoints(nextPixel));
 
+        DEBUGLOG("DisplayDoubleDigit");
+        nextPixel = &nextPixel[DisplayPoints::getNbPixels()];
+        m_listComponent.push_back(new DisplayDoubleDigit(nextPixel));
     }
 
-    void setValue(uint8_t iValue, HOUR_ELT elt)
+    void nsetValue(uint8_t iValue, HOUR_ELT elt)
     {
         m_listComponent[(uint8_t)elt]->setValue(iValue);
     };
@@ -97,6 +116,8 @@ public:
         m_listComponent[(uint8_t)elt]->setColorON(iValue);
     };
 
+public:
+    CRGB m_leds[NUM_LEDS];
 };
 
 #endif

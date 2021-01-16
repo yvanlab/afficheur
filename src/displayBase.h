@@ -40,28 +40,29 @@ public:
     m_firstPixel = firstPixel;
   }
 
-  virtual void setMode(MODE_LED mode)
+  virtual void setMode(MODE_LED mode, int8_t iSelected = -1)
   {
     m_mode = mode;
   };
 
-  virtual void setColorON(CRGB newcolor)
+  virtual void setColorON(CRGB newcolor, int8_t iSelected = -1)
   {
     //DEBUGLOGF("setColorON - %s \n",className);
     m_colorON = newcolor;
   };
 
-  virtual void setColorOFF(CRGB newcolor)
+  virtual void setColorOFF(CRGB newcolor, int8_t iSelected = -1)
   {
     m_colorOFF = newcolor;
   };
 
-  virtual void setState(boolean bON)
+  virtual void setState(boolean bON, int8_t iSelected = -1)
   {
     m_isOn = bON;
   };
 
-  virtual void setValue(uint8_t value) {
+  virtual void setValue(uint8_t value, int8_t iSelected = -1)
+  {
     setState(value!=0);
   };
 

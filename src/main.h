@@ -7,6 +7,8 @@
 
 #include <wifiManagerV2.h>
 #include <myTimer.h>
+#include "settingManager.h"
+#include "networkUI.h"
 //#include <FlashLED.h>
 
 
@@ -14,14 +16,15 @@
 
 #define PIN_LED 2
 
-#define MODULE_NAME     LA_MATRIX2_NAME
-#define MODULE_MDNS     LA_MATRIX2_MDNS
-#define MODULE_MDNS_AP  LA_MATRIX2_MDNS_AP
-#define MODULE_IP       LA_MATRIX2_IP
+#define MODULE_NAME     HORLOGE_NAME
+#define MODULE_MDNS     HORLOGE_MDNS
+#define MODULE_MDNS_AP  HORLOGE_MDNS_AP
+#define MODULE_IP       HORLOGE_IP
 
 
+extern SettingManager     *smManager;
+extern WifiManager        *wfManager;
 
-#define LAPORTE_OUVERTURE_LABEL  1 //"current"
 
 
 #ifdef MCPOC_TELNET

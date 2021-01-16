@@ -8,7 +8,7 @@ String getJson()
 
 	String tt("{\"module\":{");
 	tt += "\"nom\":\"" + String(MODULE_NAME) + "\",";
-	tt += "\"version\":\"" + String(LA_MATRIX2_VERSION) + "\",";
+	tt += "\"version\":\"" + String(HORLOGE_VERSION) + "\",";
 	tt += "\"status\":\"" + String(STATUS_PERIPHERIC_WORKING) + "\",";
 	tt += "\"uptime\":\"" + NTP.getUptimeString() + "\",";
 	tt += "\"datetime\":{" + wfManager->getHourManager()->toDTString(JSON_TEXT) + "},";
@@ -16,7 +16,6 @@ String getJson()
 	tt += "\"build_date\":\"" + String(__DATE__ " " __TIME__) + "\"},";
 
 	tt += "\"setting\":{" + smManager->toString(JSON_TEXT) + "},";
-	tt += "\"bmp\":{" + bmpMesure->toString(JSON_TEXT) + "},";
 	tt += "\"LOG\":[" + wfManager->log(JSON_TEXT) + "," + smManager->log(JSON_TEXT) + /*","+bmpMesure->log(JSON_TEXT)+*/ "]";
 	tt += "}";
 
@@ -24,18 +23,12 @@ String getJson()
 	return tt;
 }
 
-/*void firmware()
+void saveConfiguration()
 {
-	digitalWrite(PIN_LED, LOW);
-	mpPages->stopTimer();
+	smManager->writeData();
+}
 
-	DEBUGLOG("My  firmware");
-	wfManager->httpUpdaterPage();
-	//wfManager->getServer()->send_P ( 200, "text/html", HTML );
 
-	//mpPages->startTimer();
-	digitalWrite(PIN_LED, HIGH);
-}*/
 
 #ifdef OTA_FOR_ATOM
 void OTAOnStart()
@@ -48,19 +41,16 @@ void OTAOnStart()
 }
 #endif
 
-/*void clearEEPROM()
+
+void configPage()
 {
 	digitalWrite(PIN_LED, LOW);
-	mpPages->stopTimer();
-
-	DEBUGLOG("My  firmware");
-	smManager->clearData();
-	//wfManager->getServer()->send_P ( 200, "text/html", HTML );
-
-	//mpPages->startTimer();
+	DEBUGLOG("config Page");
+	wfManager->loadFromSpiffs("/config.json");
 	digitalWrite(PIN_LED, HIGH);
-	phPresence->forceStatus(true);
-}*/
+}
+
+
 
 void dataJson()
 {

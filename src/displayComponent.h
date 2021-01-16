@@ -36,57 +36,84 @@ public:
     className = __func__;
   };
 
-  virtual void add(CRGB *firstPixel) =0;
+  virtual void add(CRGB *firstPixel) = 0;
   /* {
      DEBUGLOGF("add(CRGB *firstPixel) : %s NE DOIT PAS ETRE APPELE]\n", className);
   }*/
 
-
-
-  virtual void setColorON(CRGB newcolor)
+  virtual void setColorON(CRGB newcolor, int8_t iSelected = -1)
   {
-    //DEBUGLOGF("setColorON[%s]\n", className);
     std::vector<DisplayBase *>::const_iterator itb = m_listComponent.begin();
     const std::vector<DisplayBase *>::const_iterator ite = m_listComponent.end();
 
-    for (; itb != ite; itb++)
+    if (iSelected < 0 || iSelected >= m_listComponent.size())
     {
-      (*itb)->setColorON(newcolor);
+      for (; itb != ite; itb++)
+      {
+        (*itb)->setColorON(newcolor);
+      }
+    }
+    else
+    {
+      m_listComponent[iSelected]->setColorON(newcolor);
     }
   };
 
-  virtual void setColorOFF(CRGB newcolor)
+  virtual void setColorOFF(CRGB newcolor, int8_t iSelected = -1)
   {
     //DEBUGLOGF("setValue[%d]\n", value);
-    std::vector<DisplayBase *>::const_iterator itb = m_listComponent.begin();
-    const std::vector<DisplayBase *>::const_iterator ite = m_listComponent.end();
-
-    for (; itb != ite; itb++)
+    if (iSelected < 0 || iSelected >= m_listComponent.size())
     {
-      (*itb)->setColorOFF(newcolor);
+      std::vector<DisplayBase *>::const_iterator itb = m_listComponent.begin();
+      const std::vector<DisplayBase *>::const_iterator ite = m_listComponent.end();
+
+      for (; itb != ite; itb++)
+      {
+        (*itb)->setColorOFF(newcolor);
+      }
+    }
+    else
+    {
+      m_listComponent[iSelected]->setColorOFF(newcolor);
     }
   };
 
-  virtual void setValue(uint8_t value)
+  virtual void setValue(uint8_t value, int8_t iSelected = -1)
   {
     //DEBUGLOGF("setValue[%d]\n", value);
-    std::vector<DisplayBase *>::const_iterator itb = m_listComponent.begin();
-    const std::vector<DisplayBase *>::const_iterator ite = m_listComponent.end();
-
-    for (; itb != ite; itb++)
+    if (iSelected < 0 || iSelected >= m_listComponent.size())
     {
-      (*itb)->setValue(value);
+
+      std::vector<DisplayBase *>::const_iterator itb = m_listComponent.begin();
+      const std::vector<DisplayBase *>::const_iterator ite = m_listComponent.end();
+
+      for (; itb != ite; itb++)
+      {
+        (*itb)->setValue(value);
+      }
+    }
+    else
+    {
+      m_listComponent[iSelected]->setValue(value);
     }
   };
 
-  virtual void setState(boolean bON)
+  virtual void setState(boolean bON, int8_t iSelected = -1)
   {
-    std::vector<DisplayBase *>::const_iterator itb = m_listComponent.begin();
-    const std::vector<DisplayBase *>::const_iterator ite = m_listComponent.end();
-
-    for (; itb != ite; itb++)
+    if (iSelected < 0 || iSelected >= m_listComponent.size())
     {
-      (*itb)->setState(bON);
+
+      std::vector<DisplayBase *>::const_iterator itb = m_listComponent.begin();
+      const std::vector<DisplayBase *>::const_iterator ite = m_listComponent.end();
+
+      for (; itb != ite; itb++)
+      {
+        (*itb)->setState(bON);
+      }
+    }
+    else
+    {
+      m_listComponent[iSelected]->setState(bON);
     }
   };
 
@@ -101,14 +128,22 @@ public:
     }
   };
 
-  void setMode(MODE_LED mode)
+  void setMode(MODE_LED mode, int8_t iSelected = -1)
   {
-    std::vector<DisplayBase *>::const_iterator itb = m_listComponent.begin();
-    const std::vector<DisplayBase *>::const_iterator ite = m_listComponent.end();
-
-    for (; itb != ite; itb++)
+    if (iSelected < 0 || iSelected >= m_listComponent.size())
     {
-      (*itb)->setMode(mode);
+
+      std::vector<DisplayBase *>::const_iterator itb = m_listComponent.begin();
+      const std::vector<DisplayBase *>::const_iterator ite = m_listComponent.end();
+
+      for (; itb != ite; itb++)
+      {
+        (*itb)->setMode(mode);
+      }
+    }
+    else
+    {
+      m_listComponent[iSelected]->setMode(mode);
     }
   };
 
