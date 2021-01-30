@@ -87,7 +87,7 @@ public:
     }
   };
 
-  virtual void handleMode()
+  virtual uint8_t handleMode()
   {
     //DEBUGLOGF("Mode [%d]\n", m_mode);
     if (m_mode == MODE_LED::STATIC)
@@ -153,6 +153,7 @@ public:
       }else
           display(false);
     }
+    return true;
   }
 
   static uint8_t getNbPixels() 

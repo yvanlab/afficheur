@@ -24,8 +24,14 @@ String SettingManager::toStringCfg(boolean bJson)
 	String ss;
 	if (bJson == STD_TEXT)
 		return BaseSettingManager::toString(bJson);
-	ss = "\"mainColor\":\"" + m_mainColor + "\",";
-	ss += "\"mainAnnimation\":\"" +m_mainAnnimation + "\"";
+	ss = "\"mainColor\":\"" + String(m_mainColor) +" \",";
+	ss = "\"dayIntensity\":\"" + String(m_dayIntensity) +" \",";
+	ss = "\"nightIntensity\":\"" + String(m_nightIntensity) +" \",";
+	ss = "\"dayHour\":\"" + String(m_dayHour) +" \",";
+	ss = "\"nightHour\":\"" + String(m_nightHour) +" \",";
+	ss += "\"mainAnnimation\":\"" +m_mainAnnimation + "\",";
+	// dd-mm-yyyy hh:mm:ss
+	ss += "\"alarm\":\"" +String(makeTime(m_alarm)) + "\"";
 	return ss;
 }
 
@@ -58,8 +64,14 @@ unsigned char SettingManager::readData()
 		DeserializationError error = deserializeJson(doc, file);
 		if (!error)
 		{
-			m_mainColor = String(doc[F("mainColor")].as<char*>());
+			m_dayIntensity   = doc[F("dayIntensity")];
+			m_nightIntensity = doc[F("nightIntensity")];
+			m_dayHour 		 = doc[F("dayHour")];
+			m_nightHour 	 = doc[F("nightHour")];
+
+			m_mainColor =  doc[F("mainColor")].as<uint32_t>();
 			m_mainAnnimation = String(doc[F("mainAnnimation")].as<char*>());
+			breakTime(doc[F("alarm")].as<uint32_t>(),m_alarm);
 		}
 		else
 		{

@@ -3,6 +3,37 @@
      "date": "08/06/2020",
      "time": "20:32:57"
    },
-   "mainColor": "255,0,0",
+
+
+   "rebootColorOn" : "16777215",
+   "rebootColorOff" : "0",
+   "rebootAnimation" : "DisplayBase::K2000",
+   
+   "clockColorOn": "255",
+   "clockColorOff": "0",
+   "clockAnimation": "0",
+   "clockIntensityNight": "10",
+   "clockIntensityDay": "100",
+   "clockHourDay": "06",
+   "clockHourNight": "20",
+   "clockSoundHour": "0",
+
+   "countdownColorOn": "16711680",
+   "countdownColorOff": "20",
+   "countdownAnimation": "0",
+   "countdownAnimationEnd": "0",
+   "countdownSoundStart": "0",
+   "countdownSoundEnd": "0",
+   "countdownDurationEnd": "5",
+   
+   "alarmTrigger": "15:00:00",
+   "alarmTriggerAnimation": "0",
+   "alarmTriggerSound": "0",
+   "alarmTriggerDuration": "20",
+
+   
    "mainAnnimation": "static"
+
+
+
  }

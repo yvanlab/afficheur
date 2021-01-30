@@ -40,6 +40,13 @@ public:
     UNITE = 1,
     LAST_DIGIT_ELT = 2
   };
+  enum DOUBLE_DIGIT_COMMAND
+  {
+    DASH_BOTH    = 100,
+    DASH_DIZAINE = 101,
+    DASH_UNITE   = 102
+  };
+
   DisplayDoubleDigit(CRGB *firstPixel) : DisplayComponent(firstPixel)
   {
     className = __func__;
@@ -66,11 +73,24 @@ public:
 
   virtual void setValue(uint8_t value , int8_t iSelected = -1)
   {
-    DEBUGLOGF("setValue[%d]\n", value);
-    uint8_t dizaine = value / 10;
-    uint8_t unite = value % 10;
-    m_listComponent[DIZAINE]->setValue(dizaine, iSelected);
-    m_listComponent[UNITE]->setValue(unite,iSelected);
+    //DEBUGLOGF("setValue[%d]\n", value);
+    if (value == DASH_BOTH) {
+      m_listComponent[DIZAINE]->setValue(DisplayDigit::DASH_MIDLE);
+      m_listComponent[UNITE]->setValue(DisplayDigit::DASH_MIDLE);
+    } else if (value == DASH_DIZAINE) {
+      m_listComponent[DIZAINE]->setValue(DisplayDigit::DASH_MIDLE);
+    } else  if (value == DASH_UNITE) {
+      m_listComponent[UNITE]->setValue(DisplayDigit::DASH_MIDLE);
+    } else {
+      if (iSelected == -1) {
+        uint8_t dizaine = value / 10;
+        uint8_t unite = value % 10;
+        m_listComponent[DIZAINE]->setValue(dizaine, iSelected);
+        m_listComponent[UNITE]->setValue(unite,iSelected);
+      } else {
+        m_listComponent[iSelected]->setValue(value);
+      }
+    }
   }
 
 private:

@@ -76,15 +76,55 @@ void setData()
 	DEBUGLOG("");
 #endif
 
+		int Year, Month, Day, Hour, Minute, Second ;
+
+
 	String str;
+
+	// set time
+	
+	if ((str = wfManager->getServer()->arg("time")) != NULL)
+	{
+		sscanf(str.c_str(), "%d-%d-%d %d:%d:%d", &Year, &Month, &Day, &Hour, &Minute, &Second);
+		setTime(Hour, Minute, Second, Day, Month, Year);
+	}
+	if ((str = wfManager->getServer()->arg("cptRebours")) != NULL)
+	{
+		smManager->m_compteARebour = str.toInt();
+		smManager->m_mode = SettingManager::MODE_COMPTEAREBOURS;
+	}
+	if ((str = wfManager->getServer()->arg("hourAlarm")) != NULL)
+	{
+//		#include <TimeLib.h>
+		tmElements_t tm;
+		sscanf(str.c_str(), "%d-%d-%d %d:%d:%d", &tm.Year, &tm.Month, &tm.Day, &tm.Hour, &tm.Minute, &tm.Second);
+		smManager->m_alarm = tm;
+	}
 	if ((str = wfManager->getServer()->arg("mainColor")) != NULL)
 	{
-		smManager->m_mainColor = str;
+		smManager->m_mainColor = str.toInt();//str;
 	}
-	else if ((str = wfManager->getServer()->arg("mainAnnimation")) != NULL)
+	if ((str = wfManager->getServer()->arg("mainAnnimation")) != NULL)
 	{
 		smManager->m_mainAnnimation = str;
 	}
+	if ((str = wfManager->getServer()->arg("dayIntensity")) != NULL)
+	{
+		smManager->m_dayIntensity = str.toInt();
+	}
+	if ((str = wfManager->getServer()->arg("nightIntensity")) != NULL)
+	{
+		smManager->m_nightIntensity = str.toInt();
+	}
+	if ((str = wfManager->getServer()->arg("dayHour")) != NULL)
+	{
+		smManager->m_dayHour = str.toInt();
+	}
+	if ((str = wfManager->getServer()->arg("nightHour")) != NULL)
+	{
+		smManager->m_nightHour = str.toInt();
+	}
+
 /*	else if (wfManager->getServer()->hasArg("prgHour") || wfManager->getServer()->hasArg("prgPage") || wfManager->getServer()->hasArg("prgDuration") )
 	{
 		changed = manageProg();

@@ -7,6 +7,7 @@
 //#include <baseManager.h>
 #include "displayHour.h"
 #include "displayBase.h"
+#include "horlogeManager.h"
 
 
 #if FASTLED_VERSION < 3001000
@@ -20,8 +21,12 @@
 
 SettingManager  *smManager; //(PIN_LED);
 WifiManager     *wfManager;	   //(PIN_LED, &smManager);
+HorlogeManager  *hlManager;
+
 DisplayHour     *affManager;
 CRGB *leds;
+DelayHelper      delayMode;
+
 portMUX_TYPE wtimerMux = portMUX_INITIALIZER_UNLOCKED;
 // This function draws rainbows with an ever-changing,
 // widely-varying set of parameters.
@@ -103,8 +108,9 @@ void setup()
   
   smManager = new SettingManager(PIN_LED);
 	wfManager = new WifiManager(PIN_LED, smManager);
-
-  affManager = new DisplayHour();
+  hlManager = new HorlogeManager(smManager);
+  
+  affManager = hlManager->getDisplayHour(); 
   leds = affManager->getLeds();
 
 	if (!SPIFFS.begin(true))
@@ -119,14 +125,14 @@ void setup()
 	DEBUGLOG(smManager->toString(STD_TEXT));
 	startWiFiserver();
 
-  
-
   mtTimer.begin(timerFrequence);
   mtTimer.setCustomMS(25);
+  smManager->m_mode = SettingManager::MODE_COUPURE;
+  hlManager->setConfig();
 }
 
 #ifdef MCPOC_TEST
-uint8_t iLed = 0;
+int iLed = 0;
 uint8_t iValue = 0;
 uint8_t iColor = 0;
 uint8_t iPoint = 0;
@@ -145,6 +151,7 @@ wfManager->handleClient();
   {
     char c = Serial.read();
     Serial.print(c);
+    smManager->m_mode=SettingManager::MODE_TEST;
     if (c == 'n')
     {
       iLed++;
@@ -174,7 +181,7 @@ wfManager->handleClient();
     }
     else if (c == 'v')
     {
-      //affManager->setColorON(CRGB(0, 0, 255));
+      affManager->setColorON(CRGB(0, 0, 255));
       affManager->setColorOFF(CRGB(0, 255, 255));
       Serial.printf("value[%d]\n", iValue % 100);
       affManager->setValue(iValue % 100, DisplayHour::HOUR);
@@ -200,9 +207,57 @@ wfManager->handleClient();
       iMode++;
       FastLED.show();
     }
+    else if (c == 'h')
+    {
+     smManager->m_mode = SettingManager::MODE_HEURE;
+    }
+    else if (c == 'd')
+    {
+      affManager->setColorON(CRGB(0, 0, 125));
+      affManager->setColorOFF(CRGB(0, 0, 0));
+      affManager->setValue(DisplayDoubleDigit::DASH_BOTH, DisplayHour::HOUR);
+      affManager->setValue(DisplayDoubleDigit::DASH_BOTH, DisplayHour::MINUTE);
+      affManager->setValue(DisplayDoubleDigit::DASH_BOTH, DisplayHour::SECONDE);
+    }
   }
-  affManager->handleMode();
-  FastLED.show();
+
+  switch(smManager->m_mode ) {
+    case (SettingManager::MODE_COUPURE) : {
+      hlManager->displayAfterReboot();
+      break;
+    }
+    case (SettingManager::MODE_HEURE) : {
+      hlManager->setConfig();
+      hlManager->displayHour();
+      
+      break;
+    }
+    case (SettingManager::MODE_ALARME) : {
+
+      break;
+    }
+    case (SettingManager::MODE_COMPTEAREBOURS) : {
+      if (!hlManager->displayCompteArebours()) {
+        smManager->m_mode = SettingManager::MODE_COMPTEAREBOUR_FIN;
+        delayMode.startDelay(5000);
+      }
+      break;
+    }
+    case (SettingManager::MODE_COMPTEAREBOUR_FIN) : {
+      hlManager->displayCompteAreboursFin();
+      if (delayMode.isDone()) {
+        smManager->m_mode = SettingManager::MODE_HEURE;
+      }
+      break;
+      case (SettingManager::MODE_TEST) : break;
+    }
+   
+
+
+
+  }
+    hlManager->handle();
+ 
 
 #endif
 }

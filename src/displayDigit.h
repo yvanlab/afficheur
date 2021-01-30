@@ -33,6 +33,13 @@
 class DisplayDigit : public DisplayComponent
 {
 public:
+  enum DIGIT_COMMAND
+  {
+    DASH_MIDLE   = 10,
+    DASH_TOP     = 11,
+    DASH_BOTTOM  = 12
+  };
+
   //
   DisplayDigit(CRGB *firstPixel) : DisplayComponent(firstPixel)
   {
@@ -60,11 +67,13 @@ public:
 
   virtual void setValue(uint8_t value, int8_t iSelected = -1)
   {
-    DEBUGLOGF("setValue[%d]\n", value);
+    if (value>9){
+      DEBUGLOGF("setValue[%d][%d]\n", value,DisplayDigitMapping[value]);
+    }
+    
     uint8_t mask = 0x00000001;
     std::vector<DisplayBase *>::const_iterator itb = m_listComponent.begin();
     const std::vector<DisplayBase *>::const_iterator ite = m_listComponent.end();
-
     for (; itb != ite; itb++)
     {
       if ((DisplayDigitMapping[value] & mask) != 0)
@@ -74,9 +83,11 @@ public:
       mask = mask << 1;
     }
   }
+public:
+  
 
 private:
-  const uint8_t DisplayDigitMapping[10] = {
+  const uint8_t DisplayDigitMapping[13] = {
       0b01011111, //0
       0b01010000, //1
       0b00111011, //2
@@ -86,8 +97,13 @@ private:
       0b01101111, //6
       0b01011000, //7
       0b01111111, //8
-      0b01111101  //9
+      0b01111101, //9
+      0b00100000,  //-
+      0b00001000,  //-
+      0b00000001  //-
   };
+
+  
 };
 
 #endif

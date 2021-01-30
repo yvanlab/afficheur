@@ -117,15 +117,16 @@ public:
     }
   };
 
-  virtual void handleMode()
+  virtual uint8_t handleMode()
   {
     std::vector<DisplayBase *>::const_iterator itb = m_listComponent.begin();
     const std::vector<DisplayBase *>::const_iterator ite = m_listComponent.end();
-
+    boolean bRes=false;
     for (; itb != ite; itb++)
     {
-      (*itb)->handleMode();
+      bRes |= (*itb)->handleMode();
     }
+    return bRes;
   };
 
   void setMode(MODE_LED mode, int8_t iSelected = -1)
