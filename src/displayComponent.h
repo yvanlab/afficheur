@@ -57,6 +57,7 @@ public:
     {
       m_listComponent[iSelected]->setColorON(newcolor);
     }
+    m_colorON = newcolor;
   };
 
   virtual void setColorOFF(CRGB newcolor, int8_t iSelected = -1)
@@ -76,6 +77,7 @@ public:
     {
       m_listComponent[iSelected]->setColorOFF(newcolor);
     }
+    m_colorOFF = newcolor;
   };
 
   virtual void setValue(uint8_t value, int8_t iSelected = -1)
@@ -96,6 +98,8 @@ public:
     {
       m_listComponent[iSelected]->setValue(value);
     }
+    m_isOn = value!=0;
+    m_value = value;
   };
 
   virtual void setState(boolean bON, int8_t iSelected = -1)
@@ -115,6 +119,7 @@ public:
     {
       m_listComponent[iSelected]->setState(bON);
     }
+    m_isOn = bON;
   };
 
   virtual uint8_t handleMode()
@@ -146,6 +151,7 @@ public:
     {
       m_listComponent[iSelected]->setMode(mode);
     }
+    m_mode = mode;
   };
 
 protected:

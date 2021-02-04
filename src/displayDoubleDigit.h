@@ -44,7 +44,8 @@ public:
   {
     DASH_BOTH    = 100,
     DASH_DIZAINE = 101,
-    DASH_UNITE   = 102
+    DASH_UNITE   = 102,
+    UNITY_ONLY   = 110, // + the vqlue to displqy
   };
 
   DisplayDoubleDigit(CRGB *firstPixel) : DisplayComponent(firstPixel)
@@ -81,6 +82,9 @@ public:
       m_listComponent[DIZAINE]->setValue(DisplayDigit::DASH_MIDLE);
     } else  if (value == DASH_UNITE) {
       m_listComponent[UNITE]->setValue(DisplayDigit::DASH_MIDLE);
+    } else if  (value>=UNITY_ONLY) {
+        m_listComponent[DIZAINE]->setState(false);
+        m_listComponent[UNITE]->setValue(value-UNITY_ONLY);
     } else {
       if (iSelected == -1) {
         uint8_t dizaine = value / 10;
@@ -91,6 +95,7 @@ public:
         m_listComponent[iSelected]->setValue(value);
       }
     }
+    m_value = value;
   }
 
 private:

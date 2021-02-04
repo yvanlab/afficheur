@@ -9,7 +9,8 @@
 #include "displayBase.h"
 #include "horlogeManager.h"
 
-
+// Jaune 33
+// Violet 32
 #if FASTLED_VERSION < 3001000
 #error "Requires FastLED 3.1 or later; check github for latest code."
 #endif
@@ -30,47 +31,7 @@ DelayHelper      delayMode;
 portMUX_TYPE wtimerMux = portMUX_INITIALIZER_UNLOCKED;
 // This function draws rainbows with an ever-changing,
 // widely-varying set of parameters.
-void pride()
-{
-  static uint16_t sPseudotime = 0;
-  static uint16_t sLastMillis = 0;
-  static uint16_t sHue16 = 0;
 
-  uint8_t sat8 = beatsin88(87, 220, 250);
-  uint8_t brightdepth = beatsin88(341, 96, 224);
-  uint16_t brightnessthetainc16 = beatsin88(203, (25 * 256), (40 * 256));
-  uint8_t msmultiplier = beatsin88(147, 23, 60);
-
-  uint16_t hue16 = sHue16; //gHue * 256;
-  uint16_t hueinc16 = beatsin88(113, 1, 3000);
-
-  uint16_t ms = millis();
-  uint16_t deltams = ms - sLastMillis;
-  sLastMillis = ms;
-  sPseudotime += deltams * msmultiplier;
-  sHue16 += deltams * beatsin88(400, 5, 9);
-  uint16_t brightnesstheta16 = sPseudotime;
-
-  for (uint16_t i = 0; i < NUM_LEDS; i++)
-  {
-    hue16 += hueinc16;
-    uint8_t hue8 = hue16 / 256;
-
-    brightnesstheta16 += brightnessthetainc16;
-    uint16_t b16 = sin16(brightnesstheta16) + 32768;
-
-    uint16_t bri16 = (uint32_t)((uint32_t)b16 * (uint32_t)b16) / 65536;
-    uint8_t bri8 = (uint32_t)(((uint32_t)bri16) * brightdepth) / 65536;
-    bri8 += (255 - brightdepth);
-
-    CRGB newcolor = CHSV(hue8, sat8, bri8);
-
-    uint16_t pixelnumber = i;
-    pixelnumber = (NUM_LEDS - 1) - pixelnumber;
-
-    nblend(leds[pixelnumber], newcolor, 64);
-  }
-}
 
 
 void startWiFiserver()
@@ -127,7 +88,7 @@ void setup()
 
   mtTimer.begin(timerFrequence);
   mtTimer.setCustomMS(25);
-  smManager->m_mode = SettingManager::MODE_COUPURE;
+  smManager->m_mode = SettingManager::MODE_CLOCK;
   hlManager->setConfig();
 }
 
@@ -155,7 +116,9 @@ wfManager->handleClient();
     if (c == 'n')
     {
       iLed++;
-      iLed = iLed % NUM_LEDS;
+      if (iLed>=NUM_LEDS)
+        iLed =0;
+      Serial.printf("iLed [%d]\n", iLed);
       leds[iLed] = CRGB(0, 255, 0);
       FastLED.show();
     }
@@ -203,13 +166,13 @@ wfManager->handleClient();
     }
     else if (c == 'm')
     {
-      affManager->setMode((DisplayBase::MODE_LED)(iMode % 4));
+      affManager->setMode((DisplayBase::MODE_LED)(iMode % DisplayBase::MODE_LED_LAST));
       iMode++;
       FastLED.show();
     }
     else if (c == 'h')
     {
-     smManager->m_mode = SettingManager::MODE_HEURE;
+     smManager->m_mode = SettingManager::MODE_CLOCK;
     }
     else if (c == 'd')
     {
@@ -222,32 +185,30 @@ wfManager->handleClient();
   }
 
   switch(smManager->m_mode ) {
-    case (SettingManager::MODE_COUPURE) : {
+    case (SettingManager::MODE_REBOOT) : {
       hlManager->displayAfterReboot();
       break;
     }
-    case (SettingManager::MODE_HEURE) : {
-      hlManager->setConfig();
+    case (SettingManager::MODE_CLOCK) : {
+      //hlManager->setConfig();
       hlManager->displayHour();
       
       break;
     }
-    case (SettingManager::MODE_ALARME) : {
+    case (SettingManager::MODE_ALARM) : {
 
       break;
     }
-    case (SettingManager::MODE_COMPTEAREBOURS) : {
-      if (!hlManager->displayCompteArebours()) {
-        smManager->m_mode = SettingManager::MODE_COMPTEAREBOUR_FIN;
-        delayMode.startDelay(5000);
+    case (SettingManager::MODE_COUNTDOWN) : {
+      if (!hlManager->displayCountdown()) {
+        smManager->m_mode = SettingManager::MODE_COUNTDOWN_END;
       }
       break;
     }
-    case (SettingManager::MODE_COMPTEAREBOUR_FIN) : {
-      hlManager->displayCompteAreboursFin();
-      if (delayMode.isDone()) {
-        smManager->m_mode = SettingManager::MODE_HEURE;
-      }
+    case (SettingManager::MODE_COUNTDOWN_END) : {
+      if (!hlManager->displayCountdownEnd()) {
+        smManager->m_mode = SettingManager::MODE_CLOCK;
+      };
       break;
       case (SettingManager::MODE_TEST) : break;
     }

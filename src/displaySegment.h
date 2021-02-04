@@ -49,6 +49,8 @@ public:
       (*itb)->setState(((value & mask) != 0), iSelected);
       mask = mask << 1;
     }
+    setState(value!=0);
+    m_value = value;
   }
 
   virtual void add(CRGB *firstPixel)

@@ -4,21 +4,21 @@
 
 #if defined(ARDUINO) && ARDUINO >= 100
 
-#include Arduino.h
+#include "Arduino.h"
 
 #else
 
-#include WProgram.h
+#include "WProgram.h"
 
 #endif
 
-#include ArduinoJson.h
+#include "ArduinoJson.h"
 
 #include <EEPROM.h>
 #include <baseManager.h>
 #include <BaseSettingManager.h>
 //#include <pixeltypes.h>
-#include displayBase.h
+#include "displayBase.h"
 
 class SettingManager : public BaseSettingManager
 {
@@ -26,9 +26,9 @@ class SettingManager : public BaseSettingManager
 public:
 	enum MODE_HORLOGE
 	{
-		MODE_HEURE = 0,
-		MODE_ALARME = 1,
-		MODE_COUNTDOWNS = 2,
+		MODE_CLOCK = 0,
+		MODE_ALARM = 1,
+		MODE_COUNTDOWN = 2,
 		MODE_COUNTDOWN_END = 3,
 		MODE_REBOOT = 4,
 		MODE_TEST = 5
@@ -40,7 +40,7 @@ public:
 	void writePage();
 	void readPage();
 
-	String getClassName() { return SettingManager; }
+	String getClassName() { return "SettingManager"; }
 
 	//void sortPages();
 
@@ -85,9 +85,9 @@ public:
 	String m_alarmTrigger = "15:00:00";
 	DisplayBase::MODE_LED m_alarmTriggerAnimation = DisplayBase::PSYCHEDELIC;
 	uint8_t m_alarmTriggerSound = 0;
-	uint8_t m_alarmTriggerDuration : 20;
+	uint8_t m_alarmTriggerDuration = 20;
 
-	uint32_t m_COUNTDOWN = 0;
+	uint32_t m_countdownCpt = 0;
 	MODE_HORLOGE m_mode;
 };
 

@@ -34,57 +34,88 @@ public:
 
     void displayAfterReboot()
     {
-        m_affManager->setMode(m_smManager->m_modeAfterReboot);
+        m_affManager->setMode(m_smManager->m_rebootAnimation);
+        m_affManager->setColorON(CRGB(m_smManager->m_rebootColorOn));
+        m_affManager->setColorOFF(CRGB(m_smManager->m_rebootColorOff));
         displayHour();
     }
 
     void displayHour()
     {
+        if (!myDelay.isDone()) return;
+        myDelay.startDelay(1000);
+
+        m_affManager->setMode(m_smManager->m_clockAnimation);
+        m_affManager->setColorON(CRGB(m_smManager->m_clockColorOn));
+        m_affManager->setColorOFF(CRGB(m_smManager->m_clockColorOff));
+
         uint64_t heure = now();
         //m_affManager->setMode(mLed);
-        m_affManager->setValue(hour(heure), DisplayHour::HOUR);
+        if (hour(heure)<10) {
+            m_affManager->setValue(hour(heure)+DisplayDoubleDigit::UNITY_ONLY, DisplayHour::HOUR);
+        } else {
+             m_affManager->setValue(hour(heure), DisplayHour::HOUR);
+        }  
         m_affManager->setValue(minute(heure), DisplayHour::MINUTE);
         m_affManager->setValue(second(heure), DisplayHour::SECONDE);
         uint8_t iPoint = 255;
-        if (mtTimer.is1SFrequence())
+        if (mtTimer.is250MSPeriod())
             iPoint = 0;
         m_affManager->setValue(iPoint, DisplayHour::POINT_HR);
         m_affManager->setValue(iPoint, DisplayHour::POINT_MN);
 
     }
 
-    uint8_t displayCompteArebours()
+    uint8_t displayCountdown()
     {
-        
-        if (millis()-m_previousTimeStamp < 1000) return true;
-        m_previousTimeStamp = millis();
-        if (m_smManager->m_compteARebour > 0)
-        {
-            m_smManager->m_compteARebour--;
-        }
-        uint8_t minute = m_smManager->m_compteARebour / 60;
-        uint8_t seconde = m_smManager->m_compteARebour % 60;
+        //if (millis()-m_previousTimeStamp < 1000) return true;
+        if (!myDelay.isDone()) return true;
+        myDelay.startDelay(1000);
 
-        m_affManager->setState(DisplayDoubleDigit::DASH_BOTH, DisplayHour::HOUR);
-        m_affManager->setValue(minute, DisplayHour::MINUTE);
-        m_affManager->setValue(seconde, DisplayHour::SECONDE);
-        return m_smManager->m_compteARebour!=0;
+        m_affManager->setMode(m_smManager->m_countdownAnimation);
+        m_affManager->setColorON(CRGB(m_smManager->m_countdownColorOn));
+        m_affManager->setColorOFF(CRGB(m_smManager->m_countdownColorOff));
+        m_previousTimeStamp = millis();
+        if (m_smManager->m_countdownCpt > 0)
+        {
+            m_smManager->m_countdownCpt--;
+        }
+        tmElements_t tm;
+        breakTime(m_smManager->m_countdownCpt, tm);
+        //DEBUGLOGF("h[%d]m[%d]s[%d]\n",tm.Hour,tm.Minute,tm.Second)
+        if (tm.Hour>0) {
+            m_affManager->setValue(tm.Hour, DisplayHour::HOUR);
+        } else {
+            m_affManager->setValue(DisplayDoubleDigit::DASH_BOTH, DisplayHour::HOUR);
+        }
+        if (tm.Minute>0) {
+           m_affManager->setValue(tm.Minute, DisplayHour::MINUTE);
+        } else {
+            m_affManager->setValue(DisplayDoubleDigit::DASH_BOTH, DisplayHour::MINUTE);
+        }      
+        m_affManager->setValue(tm.Second, DisplayHour::SECONDE);
+        if (m_smManager->m_countdownCpt==0) {
+            myDelay.startDelay(m_smManager->m_countdownDurationEnd*1000);
+            return false;
+        }
+        return true;
     }
 
 
-    void displayCompteAreboursFin()
+    uint8_t displayCountdownEnd()
     {
-        m_affManager->setMode(m_smManager->m_modeFinCompteaRebours);
+        m_affManager->setMode(m_smManager->m_countdownAnimationEnd);
         m_affManager->setValue(DisplayDoubleDigit::DASH_BOTH, DisplayHour::HOUR);
         m_affManager->setValue(DisplayDoubleDigit::DASH_BOTH, DisplayHour::MINUTE);
         m_affManager->setValue(DisplayDoubleDigit::DASH_BOTH, DisplayHour::SECONDE);
         m_affManager->setValue(255, DisplayHour::POINT_HR);
         m_affManager->setValue(255, DisplayHour::POINT_MN);
+        return !myDelay.isDone();
     }
 
     void setConfig() {
-        m_affManager->setMode(m_smManager->m_modeLed);
-        m_affManager->setColorON(CRGB(m_smManager->m_mainColor));
+        /*m_affManager->setMode(m_smManager->m_modeLed);
+        m_affManager->setColorON(CRGB(m_smManager->m_mainColor));*/
         //m_affManager->setColorOFF(mLed);
     }
     void handle()
@@ -102,6 +133,7 @@ protected:
     SettingManager  *m_smManager;
 
     uint32_t        m_previousTimeStamp;
+    DelayHelper     myDelay;
 };
 
 #endif
