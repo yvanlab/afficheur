@@ -16,9 +16,9 @@
 #include "delayHelper.h"
 #include <myTimer.h>
 
- static uint16_t sPseudotime;
-  static  uint16_t sLastMillis;
-    static uint16_t sHue16;
+static uint16_t sPseudotime;
+static uint16_t sLastMillis;
+static uint16_t sHue16;
 
 class DisplayBase
 {
@@ -29,11 +29,21 @@ public:
     CLiGONTANT = 1,
     PSYCHEDELIC = 2,
     K2000 = 3,
-    PSYCHEDELIC_2=4,
-    MOVE_UP_DIGIT=5,
-    MODE_LED_LAST =6,  
+    PSYCHEDELIC_2 = 4,
+    //MOVE_UP_DIGIT = 5,
+    MODE_LED_LAST =5,
   };
- 
+
+  enum MODE_TRANSITION
+  {
+    TRANSITION_NONE = 0,
+    TRANSITION_MOVE_UP = 1,
+    TRANSITION_MOVE_BOTTOM = 2,
+    TRANSITION_MOVE_LEFT = 3,
+    TRANSITION_MOVE_RIGHT = 4,
+    TRANSITION_FROM_DARK =5,
+  };
+
   DisplayBase()
   {
     m_mode = MODE_LED::STATIC;
@@ -50,6 +60,11 @@ public:
   virtual void setMode(MODE_LED mode, int8_t iSelected = -1)
   {
     m_mode = mode;
+  };
+
+  virtual void setTransition(MODE_TRANSITION transition, int8_t iSelected = -1)
+  {
+    m_transition = transition;
   };
 
   virtual void setColorON(CRGB newcolor, int8_t iSelected = -1)
@@ -70,21 +85,21 @@ public:
 
   virtual void setValue(uint8_t value, int8_t iSelected = -1)
   {
-    setState(value!=0);
+    setState(value != 0);
     m_value = value;
   };
 
   void display(boolean bON)
   {
-    if (m_isOn)  {
-      if (bON )
+    if (m_isOn)
+    {
+      if (bON)
         display(m_colorON);
       else
         display(m_colorOFF);
-    } else
-        display(m_colorSTOP);
-      
-
+    }
+    else
+      display(m_colorSTOP);
   };
 
   void display(CRGB color)
@@ -157,86 +172,87 @@ public:
             m_timer.startDelay(250);
           }
         }
-        
-      }else
-          display(false);
-    } else if (m_mode == PSYCHEDELIC_2) {
-      if (m_isOn) pride();
-      else display(false);
-
-
+      }
+      else
+        display(false);
+    }
+    else if (m_mode == PSYCHEDELIC_2)
+    {
+      if (m_isOn)
+        pride();
+      else
+        display(false);
+    }
+    else
+    {
+      display(true);
     }
     return true;
   }
 
-
   void pride()
+  {
+
+    uint8_t sat8 = beatsin88(87, 220, 250);
+    uint8_t brightdepth = beatsin88(341, 96, 224);
+    uint16_t brightnessthetainc16 = beatsin88(203, (25 * 256), (40 * 256));
+    uint8_t msmultiplier = beatsin88(147, 23, 60);
+
+    uint16_t hue16 = sHue16; //gHue * 256;
+    uint16_t hueinc16 = beatsin88(113, 1, 3000);
+
+    uint16_t ms = millis();
+    uint16_t deltams = ms - sLastMillis;
+    sLastMillis = ms;
+    sPseudotime += deltams * msmultiplier;
+    sHue16 += deltams * beatsin88(400, 5, 9);
+    uint16_t brightnesstheta16 = sPseudotime;
+
+    for (uint16_t i = 0; i < getNbPixels(); i++)
     {
 
-       
-        
-        uint8_t sat8 = beatsin88(87, 220, 250);
-        uint8_t brightdepth = beatsin88(341, 96, 224);
-        uint16_t brightnessthetainc16 = beatsin88(203, (25 * 256), (40 * 256));
-        uint8_t msmultiplier = beatsin88(147, 23, 60);
+      hue16 += hueinc16;
+      uint8_t hue8 = hue16 / 256;
 
-        uint16_t hue16 = sHue16; //gHue * 256;
-        uint16_t hueinc16 = beatsin88(113, 1, 3000);
+      brightnesstheta16 += brightnessthetainc16;
+      uint16_t b16 = sin16(brightnesstheta16) + 32768;
 
-        uint16_t ms = millis();
-        uint16_t deltams = ms - sLastMillis;
-        sLastMillis = ms;
-        sPseudotime += deltams * msmultiplier;
-        sHue16 += deltams * beatsin88(400, 5, 9);
-        uint16_t brightnesstheta16 = sPseudotime;
+      uint16_t bri16 = (uint32_t)((uint32_t)b16 * (uint32_t)b16) / 65536;
+      uint8_t bri8 = (uint32_t)(((uint32_t)bri16) * brightdepth) / 65536;
+      bri8 += (255 - brightdepth);
 
-        for (uint16_t i = 0; i <getNbPixels(); i++)
-        {
-            
-            hue16 += hueinc16;
-            uint8_t hue8 = hue16 / 256;
+      CRGB newcolor = CHSV(hue8, sat8, bri8);
 
-            brightnesstheta16 += brightnessthetainc16;
-            uint16_t b16 = sin16(brightnesstheta16) + 32768;
-
-            uint16_t bri16 = (uint32_t)((uint32_t)b16 * (uint32_t)b16) / 65536;
-            uint8_t bri8 = (uint32_t)(((uint32_t)bri16) * brightdepth) / 65536;
-            bri8 += (255 - brightdepth);
-
-            CRGB newcolor = CHSV(hue8, sat8, bri8);
-
-            /*uint16_t pixelnumber = i;
+      /*uint16_t pixelnumber = i;
             pixelnumber = (NUM_LEDS - 1) - pixelnumber;*/
-            nblend(m_firstPixel[i], newcolor, 64);
-            
-        }
+      nblend(m_firstPixel[i], newcolor, 64);
     }
+  }
 
-  static uint8_t getNbPixels() 
+  static uint8_t getNbPixels()
   {
     return 1;
   }
 
-  const char* getClassName() {
+  const char *getClassName()
+  {
     return className;
-  } 
+  }
 
 protected:
   CRGB *m_firstPixel;
   CRGB m_colorON = {255, 0, 0};
   CRGB m_colorOFF = {0, 0, 0};
-  const CRGB m_colorSTOP = {0,0,0};
+  const CRGB m_colorSTOP = {0, 0, 0};
   uint8_t m_nbLeds;
   MODE_LED m_mode = MODE_LED::STATIC;
+  MODE_TRANSITION m_transition = MODE_TRANSITION::TRANSITION_NONE;
   boolean m_isOn = false;
   uint8_t m_value = 0;
   int8_t iK2000 = 0, iK2000_incr = 1;
   DelayHelper m_timer;
 
-  const char* className;
-
-
-  
+  const char *className;
 };
 
 #endif

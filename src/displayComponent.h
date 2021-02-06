@@ -154,6 +154,27 @@ public:
     m_mode = mode;
   };
 
+
+  void setTransition(MODE_TRANSITION transition, int8_t iSelected = -1)
+  {
+    if (iSelected < 0 || iSelected >= m_listComponent.size())
+    {
+
+      std::vector<DisplayBase *>::const_iterator itb = m_listComponent.begin();
+      const std::vector<DisplayBase *>::const_iterator ite = m_listComponent.end();
+
+      for (; itb != ite; itb++)
+      {
+        (*itb)->setTransition(transition);
+      }
+    }
+    else
+    {
+      m_listComponent[iSelected]->setTransition(transition);
+    }
+    m_transition = transition;
+  };
+
 protected:
   std::vector<DisplayBase *> m_listComponent;
 };

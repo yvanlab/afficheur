@@ -1,0 +1,210 @@
+
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body {
+	font-family: Arial;
+}
+
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+  border-spacing: 5px;
+  padding: 5px;
+  vertical-align: center;
+  
+}
+table#t02 {
+ 
+  background-color: #f1f1c1;
+}
+
+/* Style the tab */
+.tab {
+	overflow: hidden;
+	border: 1px solid #ccc;
+	background-color: #f1f1f1;
+}
+
+/* Style the buttons inside the tab */
+.tab button {
+	background-color: inherit;
+	float: left;
+	border: none;
+	outline: none;
+	cursor: pointer;
+	padding: 14px 16px;
+	transition: 0.3s;
+	font-size: 17px;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+	background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+	background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+	display: none;
+	padding: 6px 12px;
+	border: 1px solid #ccc;
+	border-top: none;
+}
+</style>
+</head>
+<body>
+	<p>&nbsp;</p>
+	<h1 style="text-align: center;">
+		<span id="modulename">Module</span> configuration
+	</h1>
+	<div style="text-align: center;">
+		<p>
+			Version : <span id="version">3.0</span>
+		</p>
+	</div>
+	<div style="text-align: center;">
+		<p>
+			Date build : <span id="builddate">10/08/1900</span>
+		</p>
+	</div>
+	<div style="text-align: center;">
+		<p>
+			Up time : <span id="uptime">un moment</span>
+		</p>
+	</div>
+	<div style="text-align: center;">
+		<p>
+			<a href="/credential" target="_blank">Credentials</a>/
+			<a href="/reset" target="_blank">Wifi Reset</a>/<a
+				href="/restart" target="_blank">Restart</a>/<a
+				href="/firmware" target="_blank">Firmware</a>/<a
+				href="/config" target="_blank">Configuration</a>/<a
+		</p>
+	</div>
+	<hr
+		style="margin-top: 51px; margin-left: auto; width: 177px; margin-right: auto;" />
+	<span id="lstCfg">cfg</span>
+	
+	<hr />
+	<h2>
+		Pages
+		<button onclick="saveConfiguration()">Save</button>
+	</h2>
+	
+	<script>
+
+		
+			function saveConfiguration() {
+				var xhttp = new XMLHttpRequest();
+				xhttp.onreadystatechange = function() {
+					if (this.readyState == 4 && this.status == 200) {
+						update(this.responseText)
+					}
+				};
+	
+				xhttp.open("GET", "save",true);
+				xhttp.send();	
+			}
+		
+			
+			function changeSetting(pID, oID, act, val) {
+				document.getElementById("version").innerHTML = val;
+				var xhttp = new XMLHttpRequest();
+				xhttp.onreadystatechange = function() {
+					if (this.readyState == 4 && this.status == 200) {
+						//update(this.responseText)
+					}
+				};
+				document.getElementById("version").innerHTML = val;
+				xhttp.open("GET", "setData?obj=" + oID+ "&page=" + pID + "&" + act + "=" + String(val).replace("#",""),
+						true);
+				xhttp.send();
+			};
+
+			function update(responseText) {
+				var myObj = JSON.parse(responseText);
+				document.getElementById("builddate").innerHTML = myObj.module.build_date;
+				document.getElementById("version").innerHTML = myObj.module.version;
+				document.getElementById("modulename").innerHTML = myObj.module.nom;
+				document.getElementById("uptime").innerHTML = myObj.module.uptime;
+
+				
+				
+				/* Build cfg */
+				var res = "";
+				var tmp="";
+				var page ;
+				res = buildParameters(myObj );
+				document.getElementById("lstCfg").innerHTML = res;
+				
+				
+			};
+			
+
+
+			function changeSetting(pName,pVal) {
+				document.getElementById("version").innerHTML = pVal;
+				var xhttp = new XMLHttpRequest();
+				xhttp.onreadystatechange = function() {
+					if (this.readyState == 4 && this.status == 200) {
+						//update(this.responseText)
+					}
+				};
+				document.getElementById("version").innerHTML = pVal;
+				xhttp.open("GET", "setData?" + pName+ "=" + pVal,
+						true);
+				xhttp.send();
+			};
+
+			function buildOnChangeSetting(pName) {
+				var res = ' onchange="changeSetting(\''
+					+ pName +  '\',this.value)"';
+				return res;
+			}
+
+			function buildParameters(myObj ) {
+				var lstParam = myObj.setting;// getLstPagesName(myObj.setting.page);
+				var res = '<table id="t01".checked >	';
+				var paramNamecurrent = '';	
+				var i = 0;
+				res+= '<tr>';
+				for (paramName in lstParam) {					
+					paramValue = lstParam[paramName];					
+					if (paramNamecurrent != paramName.substring(0,3) ) {
+						res+= '</tr><tr  style="background-color:#FF0000"> <td></td><td></td></tr><tr>';
+						paramNamecurrent = paramName.substring(0,3);
+					}
+					res += '<td>' + paramName + '</td>';
+					res +=  '<td>';
+					res +=  '<input type="text"'  + buildOnChangeSetting( paramName) + 'value=' +paramValue+ ' /> '
+					res += '</td>';
+					res += '</tr><tr>';
+				}
+				res += '</tr></table>';
+				return res;
+			}
+			
+
+			function init() {
+				var xhttp = new XMLHttpRequest();
+				xhttp.onreadystatechange = function() {
+					if (this.readyState == 4 && this.status == 200) {
+						update(this.responseText)
+					}
+				};
+
+				xhttp.open("GET", "status", true);
+				xhttp.send();
+			}
+			window.onload = init;
+		</script>
+
+</body>
+</html>

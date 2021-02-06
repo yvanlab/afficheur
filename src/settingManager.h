@@ -63,11 +63,13 @@ public:
 	uint32_t m_rebootColorOn = 16777215;
 	uint32_t m_rebootColorOff = 0;
 	DisplayBase::MODE_LED m_rebootAnimation = DisplayBase::K2000;
+	DisplayBase::MODE_TRANSITION m_rebootTransition = DisplayBase::TRANSITION_NONE;
 	
 	
 	uint32_t m_clockColorOn = 255;
 	uint32_t m_clockColorOff = 0;
 	DisplayBase::MODE_LED m_clockAnimation = DisplayBase::STATIC;
+	DisplayBase::MODE_TRANSITION m_clockTransition = DisplayBase::TRANSITION_NONE;
 	uint8_t m_clockIntensityNight = 10;
 	uint8_t m_clockIntensityDay = 100;
 	uint8_t m_clockHourDay = 06;
@@ -78,12 +80,14 @@ public:
 	uint32_t m_countdownColorOff = 20;
 	DisplayBase::MODE_LED m_countdownAnimation = DisplayBase::STATIC;
 	DisplayBase::MODE_LED m_countdownAnimationEnd = DisplayBase::PSYCHEDELIC;
+	DisplayBase::MODE_TRANSITION m_countdownTransition = DisplayBase::TRANSITION_NONE;
 	uint8_t m_countdownSoundStart = 0;
 	uint8_t m_countdownSoundEnd = 0;
 	uint8_t m_countdownDurationEnd = 5;
 
 	String m_alarmTrigger = "15:00:00";
 	DisplayBase::MODE_LED m_alarmTriggerAnimation = DisplayBase::PSYCHEDELIC;
+	DisplayBase::MODE_TRANSITION m_alarmTriggerTransition = DisplayBase::TRANSITION_NONE;
 	uint8_t m_alarmTriggerSound = 0;
 	uint8_t m_alarmTriggerDuration = 20;
 

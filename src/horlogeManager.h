@@ -35,6 +35,7 @@ public:
     void displayAfterReboot()
     {
         m_affManager->setMode(m_smManager->m_rebootAnimation);
+        m_affManager->setTransition(m_smManager->m_rebootTransition);
         m_affManager->setColorON(CRGB(m_smManager->m_rebootColorOn));
         m_affManager->setColorOFF(CRGB(m_smManager->m_rebootColorOff));
         displayHour();
@@ -46,6 +47,8 @@ public:
         myDelay.startDelay(1000);
 
         m_affManager->setMode(m_smManager->m_clockAnimation);
+        m_affManager->setTransition(m_smManager->m_clockTransition);
+        
         m_affManager->setColorON(CRGB(m_smManager->m_clockColorOn));
         m_affManager->setColorOFF(CRGB(m_smManager->m_clockColorOff));
 

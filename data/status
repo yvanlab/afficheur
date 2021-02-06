@@ -1,10 +1,16 @@
 {
-   "datetime": {
-     "date": "08/06/2020",
-     "time": "20:32:57"
-   },
-
-
+  "module": {
+    "nom": "LaMatrixII-debug",
+    "version": "2.00",
+    "status": "2",
+    "uptime": "   0 days 00:08:07",
+    "datetime": {
+      "date": "20/04/2019",
+      "time": "18:53:43"
+    },
+    "build_date": "Apr 20 2019 18:19:01"
+  },
+  "setting": {
    "rebootColorOn" : "16777215",
    "rebootColorOff" : "0",
    "rebootAnimation" : "3",
@@ -37,6 +43,5 @@
    
    "mainAnnimation": "static"
 
-
-
- }
+  }
+}

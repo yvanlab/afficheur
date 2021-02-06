@@ -106,6 +106,10 @@ void setData()
 	{
 		smManager->m_rebootAnimation = (DisplayBase::MODE_LED)str.toInt();
 	}
+	if ((str = wfManager->getServer()->arg("rebootTransition")) != NULL)
+	{
+		smManager->m_rebootTransition = (DisplayBase::MODE_TRANSITION)str.toInt();
+	}
 
 	/*
  "alarmTrigger": "15:00:00",
@@ -139,6 +143,10 @@ void setData()
 	if ((str = wfManager->getServer()->arg("clockAnimation")) != NULL)
 	{
 		smManager->m_clockAnimation = (DisplayBase::MODE_LED)str.toInt();
+	}
+	if ((str = wfManager->getServer()->arg("clockTransition")) != NULL)
+	{
+		smManager->m_clockTransition = (DisplayBase::MODE_TRANSITION)str.toInt();
 	}
 	if ((str = wfManager->getServer()->arg("clockIntensityNight")) != NULL)
 	{
@@ -187,6 +195,10 @@ void setData()
 	if ((str = wfManager->getServer()->arg("countdownAnimation")) != NULL)
 	{
 		smManager->m_countdownAnimation = (DisplayBase::MODE_LED)str.toInt();
+	}
+	if ((str = wfManager->getServer()->arg("countdownTransition")) != NULL)	
+	{
+		smManager->m_countdownTransition = (DisplayBase::MODE_TRANSITION)str.toInt();
 	}
 	if ((str = wfManager->getServer()->arg("countdownAnimationEnd")) != NULL)
 	{

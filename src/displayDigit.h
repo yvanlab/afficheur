@@ -69,47 +69,50 @@ public:
 
   virtual void setValue(uint8_t value, int8_t iSelected = -1)
   {
-    /*if (value>9){
-      DEBUGLOGF("setValue[%d][%d]\n", value,DisplayDigitMapping[value]);
-    }*/
-
     uint8_t mask = 0x00000001;
-    /*std::vector<DisplayBase *>::const_iterator itb = m_listComponent.begin();
-    const std::vector<DisplayBase *>::const_iterator ite = m_listComponent.end();
-    for (; itb != ite; itb++)
-    {
-      if ((DisplayDigitMapping[value] & mask) != 0)
-        (*itb)->setValue(255, iSelected);
-      else
-        (*itb)->setValue(0, iSelected);*/
+
+    if ( (m_value != value) && (m_transition == DisplayBase::TRANSITION_MOVE_UP)) {
+      DEBUGLOGF("value[%d] m_value[%d]\n", value, m_value);
+      m_iPos = 0;
+    }
+
     for (uint8_t i = 0; i < 7; i++)
     {
       if ((DisplayDigitMapping[value] & mask) != 0)
-        m_listComponent[i]->setValue(getValueForAnnimation(i), iSelected);
+      {
+        uint8_t v = getValueForAnnimation(i);
+        //DEBUGLOGF("moveUp p[%d] v[%d] i[%d] m[%d]\n", m_iPos, m_value, i, v);
+        m_listComponent[i]->setValue(v, iSelected);
+      }
       else
+      {
         m_listComponent[i]->setValue(0, iSelected);
+      }
       mask = mask << 1;
     }
 
-    //setState(value!=0);
+    m_isOn  = (value!=0);
     m_value = value;
   }
 
   uint8_t getValueForAnnimation(uint8_t index)
   {
 
+    if (m_transition != DisplayBase::TRANSITION_MOVE_UP || (m_iPos == 8) )
+      return 255;
+
     uint8_t iMaskTop = 0b11111111 >> (7 - m_iPos);    //0000 0001
     uint8_t iMaskBottom = 0b11111111 << (7 - m_iPos); //1000 0000
                                                       //DEBUGLOGF("handleMode [%d][%d]",iMask,iMask&0b111);
     switch (index)
     {
-    case 0: //horizontale bottom
+    case 0: //horizontal bottom
       if (iMaskTop & 0b0001)
         return 255;
       else
         return 0;
     case 1: //vertical left bottom
-      return iMaskTop & 0b111;
+      return (iMaskTop>>1) & 0b111;
     case 2: ////vertical left top
       return (iMaskTop >> 4) & 0b111;
     case 3: //Hori top
@@ -125,103 +128,30 @@ public:
       else
         return 0;
     case 6: // vert right bottom
-      return (iMaskBottom >> 5) & 0b111;
+      return (iMaskBottom >> 4) & 0b111;
     }
+    return 255;
   }
 
   virtual uint8_t handleMode()
   {
-    if (!m_timer.isDone())
-      return false;
-    m_timer.startDelay(1000);
-    m_iPos++;
-    DEBUGLOGF("moveUp[%d]\n", m_iPos);
-    setValue(m_value);
-    if (m_iPos == 8)
-      m_iPos = 0;
-    return true;
-
     //DEBUGLOGF("moveUp[%d]\n",m_mode);
-    /* if (m_mode == DisplayBase::MOVE_UP_DIGIT)
+    if (m_transition == DisplayBase::TRANSITION_MOVE_UP && (m_iPos < 8))
     {
+      //if  return DisplayComponent::handleMode(); 
       //DEBUGLOG("moveUp");
-      return moveUp();
+      if (!m_timer.isDone())
+        return false;
+      m_timer.startDelay(25);
+      //moveUp();
+      setValue(m_value);
+      m_iPos++;
+      //DEBUGLOGF("moveUp[%d][%d]\n", m_iPos,m_value);
     }
-    else
-    {
-      return DisplayComponent::handleMode();
-    }*/
+    return DisplayComponent::handleMode();
   }
 
-  uint8_t moveUp()
-  {
 
-    uint8_t iMaskTop = 0b000001;
-    uint8_t iMaskBottom;
-
-    if (!m_timer.isDone())
-      return false;
-    m_timer.startDelay(1000);
-    DEBUGLOGF("moveUp[%d]\n", m_iPos);
-
-    iMaskTop = 0b11111111 >> (7 - m_iPos);    //0000 0001
-    iMaskBottom = 0b11111111 << (7 - m_iPos); //1000 0000
-                                              //DEBUGLOGF("handleMode [%d][%d]",iMask,iMask&0b111);
-    //First segments up (1,6)
-    // 001  100
-    // 011  11
-    // 111  111
-
-    //Vetricale
-    m_listComponent[1]->setValue(iMaskTop & 0b111);
-    m_listComponent[1]->handleMode();
-
-    m_listComponent[6]->setValue((iMaskBottom >> 5) & 0b111);
-    m_listComponent[6]->handleMode();
-
-    m_listComponent[2]->setValue((iMaskTop >> 4) & 0b111);
-    m_listComponent[2]->handleMode();
-
-    m_listComponent[4]->setValue((iMaskBottom >> 1) & 0b111);
-    m_listComponent[4]->handleMode();
-
-    //horizontale
-    if (iMaskTop & 0b0001)
-    {
-      m_listComponent[0]->setValue(255);
-    }
-    else
-    {
-      m_listComponent[0]->setValue(0);
-    }
-    m_listComponent[0]->handleMode();
-
-    if (iMaskTop & 0b1000)
-    {
-      m_listComponent[5]->setValue(255);
-    }
-    else
-    {
-      m_listComponent[5]->setValue(0);
-    }
-    m_listComponent[5]->handleMode();
-
-    if (iMaskTop & 0b10000000)
-    {
-      m_listComponent[3]->setValue(255);
-    }
-    else
-    {
-      m_listComponent[3]->setValue(0);
-    }
-    m_listComponent[3]->handleMode();
-
-    m_iPos++;
-
-    if (m_iPos == 8)
-      m_iPos = 0;
-    return true;
-  }
 
 public:
 private:
