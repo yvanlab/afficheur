@@ -30,10 +30,12 @@ String SettingManager::toStringCfg(boolean bJson)
 	ss += "\"rebootColorOn\":\"" + String(m_rebootColorOn) + "\",";
 	ss += "\"rebootColorOff\":\"" + String(m_rebootColorOff) + "\",";
 	ss += "\"rebootAnimation\":\"" + String(m_rebootAnimation) + "\",";
+		ss += "\"rebootTransition\":\"" + String(m_rebootTransition) + "\",";
 
 	ss += "\"clockColorOn\":\"" + String(m_clockColorOn) + "\",";
 	ss += "\"clockColorOff\":\"" + String(m_clockColorOff) + "\",";
 	ss += "\"clockAnimation\":\"" + String(m_clockAnimation) + "\",";
+	ss += "\"clockTransition\":\"" + String(m_clockTransition) + "\",";
 	ss += "\"clockIntensityNight\":\"" + String(m_clockIntensityNight) + "\",";
 	ss += "\"clockIntensityDay\":\"" + String(m_clockIntensityDay) + "\",";
 	ss += "\"clockHourDay\":\"" + String(m_clockHourDay) + "\",";
@@ -44,14 +46,15 @@ String SettingManager::toStringCfg(boolean bJson)
 	ss += "\"countdownColorOn\":\"" + String(m_countdownColorOn) + "\",";
 	ss += "\"countdownColorOff\":\"" + String(m_countdownColorOff) + "\",";
 	ss += "\"countdownAnimation\":\"" + String(m_countdownAnimation) + "\",";
+ss += "\"countdownTransition\":\"" + String(m_countdownTransition) + "\",";
 	ss += "\"countdownAnimationEnd\":\"" + String(m_countdownAnimationEnd) + "\",";
 	ss += "\"countdownSoundStart\":\"" + String(m_countdownSoundStart) + "\",";
-	;
 	ss += "\"countdownSoundEnd\":\"" + String(m_countdownSoundEnd) + "\",";
 	ss += "\"countdownDurationEnd\":\"" + String(m_countdownDurationEnd) + "\",";
 
 	ss += "\"alarmTrigger\":\"" + String(m_alarmTrigger) + "\",";
 	ss += "\"alarmTriggerAnimation\":\"" + String(m_alarmTriggerAnimation) + "\",";
+ss += "\"alarmTriggerTransition\":\"" + String(m_alarmTriggerTransition) + "\",";
 	ss += "\"alarmTriggerSound\":\"" + String(m_alarmTriggerSound) + "\",";
 	ss += "\"alarmTriggerDuration\":\"" + String(m_alarmTriggerDuration) + "\"";
 

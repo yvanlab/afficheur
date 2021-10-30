@@ -1,0 +1,149 @@
+#include <Arduino.h>
+#ifdef ESP32
+#include <WiFi.h>
+#include "SPIFFS.h"
+#else
+#include <ESP8266WiFi.h>
+#endif
+#include "AudioFileSourceSPIFFS.h"
+#include "AudioFileSourceID3.h"
+#include "AudioGeneratorMP3.h"
+#include "AudioOutputI2S.h"
+#include "AudioOutputI2SNoDAC.h"
+#include "FastLED.h"
+
+// To run, set your ESP8266 build to 160MHz, and include a SPIFFS of 512KB or greater.
+// Use the "Tools->ESP8266/ESP32 Sketch Data Upload" menu to write the MP3 to SPIFFS
+// Then upload the sketch normally.
+
+// pno_cs from https://ccrma.stanford.edu/~jos/pasp/Sound_Examples.html
+
+AudioGeneratorMP3 *mp3;
+AudioFileSourceSPIFFS *file;
+AudioOutputI2S *out;
+AudioFileSourceID3 *id3;
+
+TaskHandle_t Task1;
+
+// Called when a metadata event occurs (i.e. an ID3 tag, an ICY block, etc.
+void MDCallback(void *cbData, const char *type, bool isUnicode, const char *string)
+{
+  (void)cbData;
+  Serial.printf("ID3 callback for: %s = '", type);
+
+  if (isUnicode)
+  {
+    string += 2;
+  }
+
+  while (*string)
+  {
+    char a = *(string++);
+    if (isUnicode)
+    {
+      string++;
+    }
+    Serial.printf("%c", a);
+  }
+  Serial.printf("'\n");
+  Serial.flush();
+}
+
+void soundManagement(void *pvParameters)
+{
+  Serial.println("Task1 running on second core ");
+
+  /*audioLogger = &Serial;
+  file = new AudioFileSourceSPIFFS("/viola.mp3");
+  id3 = new AudioFileSourceID3(file);
+  id3->RegisterMetadataCB(MDCallback, (void*)"ID3TAG");
+  out = new AudioOutputI2S(0,1);
+  mp3 = new AudioGeneratorMP3();
+  mp3->begin(id3, out);
+
+	while (true)
+	{
+	 if (mp3->isRunning()) {
+    if (!mp3->loop()) mp3->stop();
+  } else {
+    Serial.printf("MP3 done\n");
+    delay(1000);
+  }
+	};*/
+  while (true)
+  {
+    delay(10);
+    FastLED.show();
+  }
+}
+CRGB leds[32];
+#define NUM_LEDS 21 + 21 + 2 + 21 + 21 + 2 + 21 + 21
+#define DATA_PIN 2
+//#define CLK_PIN   4
+#define LED_TYPE SK6812
+#define COLOR_ORDER RGB
+
+void setup()
+{
+  WiFi.mode(WIFI_OFF);
+  Serial.begin(115200);
+  delay(1000);
+  SPIFFS.begin();
+  Serial.printf("Sample MP3 playback begins...\n");
+
+  FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS)
+      .setCorrection(TypicalLEDStrip)
+      .setDither(1 < 255);
+
+  audioLogger = &Serial;
+  file = new AudioFileSourceSPIFFS("/dum.mp3");
+  id3 = new AudioFileSourceID3(file);
+  //id3->RegisterMetadataCB(MDCallback, (void*)"ID3TAG");
+  out = new AudioOutputI2S(0, 1);
+  mp3 = new AudioGeneratorMP3();
+  mp3->begin(id3, out);
+
+  xTaskCreatePinnedToCore(
+      soundManagement, /* Task function. */
+      "Task1",         /* name of task. */
+      10000,           /* Stack size of task */
+      NULL,            /* parameter of the task */
+      1,               /* priority of the task */
+      &Task1,          /* Task handle to keep track of created task */
+      0);              /* pin task to core 0 */
+}
+
+void loop()
+{
+  if (mp3->isRunning())
+  {
+    if (!mp3->loop())
+      mp3->stop();
+  }
+  if (Serial.available())
+  {
+    char c = Serial.read();
+    Serial.print(c);
+    if (c == 'v')
+    {
+      file->open("/viola.mp3");
+      mp3->begin(id3, out);
+    }
+    if (c == 'd')
+    {
+      file->open("/dum.mp3");
+      mp3->begin(id3, out);
+    }
+    if (c == 'w')
+    {
+      WiFi.mode(WIFI_AP_STA);
+     
+    }
+    if (c == 'o')
+    {
+      WiFi.mode(WIFI_OFF);
+     
+    }
+    delay(1);
+  }
+}

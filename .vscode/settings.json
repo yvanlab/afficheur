@@ -43,5 +43,8 @@
         "typeinfo": "cpp",
         "iterator": "cpp"
     },
-    "C_Cpp.errorSquiggles": "Disabled"
+    "C_Cpp.errorSquiggles": "Disabled",
+    "platformio-ide.activateOnlyOnPlatformIOProject": true,
+    "platformio-ide.disablePIOHomeStartup": true,
+    "cmake.configureOnOpen": true
 }

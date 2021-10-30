@@ -1,0 +1,123 @@
+// Demo's how to play multiple sounds one after the other, those sounds can be WAVs
+// or Music Score's or a mixture, here we demo wavs, showing that you can add the same wav
+// more than once and also clear out the sequence and create a different sequence 
+// Compile and upload the code, open the serial monitor and type in any number. The number will
+// be spoke back to you a digit at a time and also displayed on the serial monitor.
+// See www.xtronical.com for write ups on sound and the hardare required
+
+#include <Arduino.h>
+
+// Playing a simple melody using the XTronical DAC Audio library
+// Demonstrates use of the music score object
+// See www.xtronical.com for write ups on sound and for hardware required
+
+#include "MusicDefinitions.h"
+#include "XT_DAC_Audio.h"
+#include "WiFi.h"
+
+
+// https://github.com/robsoncouto/arduino-songs
+https://github.com/robsoncouto/arduino-songs/blob/master/supermariobros/supermariobros.ino
+https://github.com/robsoncouto/arduino-songs/blob/master/odetojoy/odetojoy.ino
+https://github.com/robsoncouto/arduino-songs/blob/master/pinkpanther/pinkpanther.ino
+https://github.com/robsoncouto/arduino-songs/blob/master/takeonme/takeonme.ino
+
+// Data for the melody. Note followed by optional change in playing length in 1/4 beats. See documentation for more details
+int8_t PROGMEM TwinkleTwinkle[] = {
+  NOTE_C5,NOTE_C5,NOTE_G5,NOTE_G5,NOTE_A5,NOTE_A5,NOTE_G5,BEAT_2,
+  NOTE_F5,NOTE_F5,NOTE_E5,NOTE_E5,NOTE_D5,NOTE_D5,NOTE_C5,BEAT_2,
+  NOTE_G5,NOTE_G5,NOTE_F5,NOTE_F5,NOTE_E5,NOTE_E5,NOTE_D5,BEAT_2,
+  NOTE_G5,NOTE_G5,NOTE_F5,NOTE_F5,NOTE_E5,NOTE_E5,NOTE_D5,BEAT_2,
+  NOTE_C5,NOTE_C5,NOTE_G5,NOTE_G5,NOTE_A5,NOTE_A5,NOTE_G5,BEAT_2,
+  NOTE_F5,NOTE_F5,NOTE_E5,NOTE_E5,NOTE_D5,NOTE_D5,NOTE_C5,BEAT_4,  
+  NOTE_SILENCE,BEAT_5,SCORE_END
+};
+
+int8_t PROGMEM notes[] = {
+  NOTE_CS8, NOTE_SILENCE,  NOTE_CS8, NOTE_SILENCE,
+  NOTE_B7,  NOTE_CS8, NOTE_SILENCE,  NOTE_E7,
+  NOTE_SILENCE,  NOTE_CS8, NOTE_SILENCE,  NOTE_SILENCE
+};
+
+
+int8_t PROGMEM  melody[] = {
+
+  // Cannon in D - Pachelbel
+  // Score available at https://musescore.com/user/4710311/scores/1975521
+  // C F
+  NOTE_FS4,2, NOTE_E4,2,
+  NOTE_D4,2, NOTE_CS4,2,
+  NOTE_B3,2, NOTE_A3,2,
+  NOTE_B3,2, NOTE_CS4,2,
+  NOTE_FS4,2, NOTE_E4,2,
+  NOTE_D4,2, NOTE_CS4,2,
+  NOTE_B3,2, NOTE_A3,2,
+  NOTE_B3,2, NOTE_CS4,2,
+  NOTE_D4,2, NOTE_CS4,2,
+  NOTE_B3,2, NOTE_A3,2,
+  NOTE_G3,2, NOTE_FS3,2,
+  NOTE_G3,2, NOTE_A3,2,
+
+  NOTE_D4,4, NOTE_FS4,8, NOTE_G4,8, NOTE_A4,4, NOTE_FS4,8, NOTE_G4,8, 
+  NOTE_A4,4, NOTE_B3,8, NOTE_CS4,8, NOTE_D4,8, NOTE_E4,8, NOTE_FS4,8, NOTE_G4,8, 
+  NOTE_FS4,4, NOTE_D4,8, NOTE_E4,8, NOTE_FS4,4, NOTE_FS3,8, NOTE_G3,8,
+  NOTE_A3,8, NOTE_G3,8, NOTE_FS3,8, NOTE_G3,8, NOTE_A3,2,
+  NOTE_G3,4, NOTE_B3,8, NOTE_A3,8, NOTE_G3,4, NOTE_FS3,8, NOTE_E3,8, 
+  NOTE_FS3,4, NOTE_D3,8, NOTE_E3,8, NOTE_FS3,8, NOTE_G3,8, NOTE_A3,8, NOTE_B3,8,
+
+  NOTE_G3,4, NOTE_B3,8, NOTE_A3,8, NOTE_B3,4, NOTE_CS4,8, NOTE_D4,8,
+  NOTE_A3,8, NOTE_B3,8, NOTE_CS4,8, NOTE_D4,8, NOTE_E4,8, NOTE_FS4,8, NOTE_G4,8, NOTE_A4,2,
+  NOTE_A4,4, NOTE_FS4,8, NOTE_G4,8, NOTE_A4,4,
+  NOTE_FS4,8, NOTE_G4,8, NOTE_A4,8, NOTE_A3,8, NOTE_B3,8, NOTE_CS4,8,
+  NOTE_D4,8, NOTE_E4,8, NOTE_FS4,8, NOTE_G4,8, NOTE_FS4,4, NOTE_D4,8, NOTE_E4,8,
+  NOTE_FS4,8, NOTE_CS4,8, NOTE_A3,8, NOTE_A3,8,
+
+  NOTE_CS4,4, NOTE_B3,4, NOTE_D4,8, NOTE_CS4,8, NOTE_B3,4,
+  NOTE_A3,8, NOTE_G3,8, NOTE_A3,4, NOTE_D3,8, NOTE_E3,8, NOTE_FS3,8, NOTE_G3,8,
+  NOTE_A3,8, NOTE_B3,4, NOTE_G3,4, NOTE_B3,8, NOTE_A3,8, NOTE_B3,4,
+  NOTE_CS4,8, NOTE_D4,8, NOTE_A3,8, NOTE_B3,8, NOTE_CS4,8, NOTE_D4,8, NOTE_E4,8,
+  NOTE_FS4,8, NOTE_G4,8, NOTE_A4,2,  
+   
+  
+};
+
+
+int8_t PROGMEM meElephant[] = {
+
+  // Baby Elephant Walk
+  // Score available at https://musescore.com/user/7965776/scores/1862611
+
+  
+  NOTE_C4,-8, NOTE_E4,16, NOTE_G4,8, NOTE_C5,8, NOTE_E5,8, NOTE_D5,8, NOTE_C5,8, NOTE_A4,8,
+  NOTE_FS4,8, NOTE_G4,8, NOTE_SILENCE,4, NOTE_SILENCE,2,
+  NOTE_C4,-8, NOTE_E4,16, NOTE_G4,8, NOTE_C5,8, NOTE_E5,8, NOTE_D5,8, NOTE_C5,8, NOTE_A4,8,
+  NOTE_G4,-2, NOTE_A4,8, NOTE_DS4,1,
+  
+  NOTE_A4,8,
+  NOTE_E4,8, NOTE_C4,8, NOTE_SILENCE,4, NOTE_SILENCE,2,
+  NOTE_C4,-8, NOTE_E4,16, NOTE_G4,8, NOTE_C5,8, NOTE_E5,8, NOTE_D5,8, NOTE_C5,8, NOTE_A4,8,
+  NOTE_FS4,8, NOTE_G4,8, NOTE_SILENCE,4, NOTE_SILENCE,4, NOTE_SILENCE,8, NOTE_G4,8,
+  NOTE_D5,4, NOTE_D5,4, NOTE_B4,8, NOTE_G4,8, NOTE_SILENCE,8, NOTE_G4,8,
+   
+  NOTE_C5,4, NOTE_C5,4, NOTE_AS4,16, NOTE_C5,16, NOTE_AS4,16, NOTE_G4,16, NOTE_F4,8, NOTE_DS4,8,
+  NOTE_FS4,4, NOTE_FS4,4, NOTE_F4,16, NOTE_G4,16, NOTE_F4,16, NOTE_DS4,16, NOTE_C4,8, NOTE_G4,8,
+  NOTE_AS4,8, NOTE_C5,8, NOTE_SILENCE,4, NOTE_SILENCE,2,
+};
+
+XT_DAC_Audio_Class DacAudio(25,0);                                            // Create the main player class object. Use GPIO 25 (DAC pin) and timer 0
+XT_MusicScore_Class Music(TwinkleTwinkle,TEMPO_ALLEGRO,INSTRUMENT_PIANO);     // Music score object, handles tunes. Pass Music Data,Tempo, Instrument 
+                                                                              // You can just pass the music data and the NOTE_SILENCE will default to... well.... default values!
+
+void setup() {
+  //DacAudio.DacVolume = 2;
+  DacAudio.Play(&Music);    
+  WiFi.mode(WIFI_AP_STA);   
+
+}
+
+void loop() {
+  DacAudio.FillBuffer();          // This needs only be in your main loop once, suggest here at the top.
+  delay(1);
+  //SetVolume(10);
+  // put whatever code you want here that you would normally have on your loop
+}

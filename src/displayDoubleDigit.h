@@ -63,7 +63,7 @@ public:
 
   virtual void add(CRGB *firstPixel)
   {
-    DEBUGLOGF("add(CRGB *firstPixel) : %s \n", className);
+    //DEBUGLOGF("add(CRGB *firstPixel) : %s \n", className);
     CRGB *nextPixel = firstPixel;
     for (uint8_t i = 0; i < 2; i++)
     {

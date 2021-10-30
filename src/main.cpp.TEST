@@ -1,0 +1,172 @@
+#include "FastLED.h"
+
+#include <wifiManagerV2.h>
+#include <myTimer.h>
+#include <HTTPClient.h>
+#include "main.h"
+//#include <baseManager.h>
+#include "displayHour.h"
+#include "displayBase.h"
+#include <fs.h>
+#include "SPIFFS.h"
+
+// #include "AudioFileSourceSPIFFS.h"
+// #include "AudioFileSourceID3.h"
+// #include "AudioGeneratorMP3.h"
+// #include "AudioOutputI2S.h"
+// #include "AudioOutputI2SNoDAC.h"
+
+void startWiFiserver();
+void displayManagement(void *pvParameters);
+
+// Jaune 33
+// Violet 32
+#if FASTLED_VERSION < 3001000
+#error "Requires FastLED 3.1 or later; check github for latest code."
+#endif
+
+//#define 21 86
+
+//Afficheur aff(leds);
+
+CRGB leds[130];
+boolean bAuto = true;
+void setup()
+{
+
+  //delay(3000); // 3 second delay for recovery
+
+  Serial.begin(115200); //delay(500);
+  Serial.println("start debuging");
+  DEBUGLOGF("Frq : %d \n", ESP.getCpuFreqMHz());
+  DEBUGLOGF("Temp : %f \n", temperatureRead());
+  FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, 130)
+      .setCorrection(TypicalLEDStrip)
+      .setDither(BRIGHTNESS < 255);
+
+  // set master brightness control
+  FastLED.setBrightness(BRIGHTNESS);
+
+  for (uint8_t i = 0; i < 21; i++)
+  {
+    leds[i].red = 10 * i;
+  }
+  FastLED.show();
+}
+
+#ifdef MCPOC_TEST
+int iLed = 0;
+uint8_t iValue = 0;
+uint8_t iColor = 0;
+uint8_t iPoint = 0;
+uint8_t iMode = 0;
+uint8_t iSound = 0;
+CRGB cc[] = {CRGB(255, 0, 0), CRGB(0, 255, 0), CRGB(0, 0, 255), CRGB(0, 255, 255), CRGB(255, 0, 255), CRGB(255, 255, 0), CRGB(255, 255, 255), CRGB(50, 50, 50)};
+
+DelayHelper dd;
+#endif
+
+void loop()
+{
+
+  if (Serial.available())
+  {
+    char c = Serial.read();
+    Serial.print(c);
+    bAuto = false;
+
+    if (c == 'n')
+    {
+
+      if (iLed > 130)
+        iLed = 0;
+      Serial.printf("iLed [%d]\n", iLed);
+      leds[iLed] = CRGB(0, 255, 0);
+      iLed++;
+      FastLED.show();
+    }
+    else if (c == 'h')
+    {
+      bAuto = true;
+    }
+
+    else if (c == 'a')
+    {
+      for (uint8_t i = 0; i < 130; i++)
+      {
+        leds[i] = cc[iColor % 8];
+      }
+      iColor++;
+      FastLED.show();
+    }
+    else if (c == 'c')
+    {
+      for (uint8_t i = 0; i < 130; i++)
+      {
+        leds[i] = CRGB(0, 0, 0);
+      }
+      //p->setState(false);
+      iLed = 0;
+      FastLED.show();
+    }
+    /* else if (c == 'v')
+      {
+        affManager->setColorON(CRGB(0, 0, 255));
+        affManager->setColorOFF(CRGB(0, 255, 255));
+        Serial.printf("value[%d]\n", iValue % 100);
+        affManager->setValue(iValue % 100, DisplayHour::HOUR);
+        affManager->setValue(iValue % 100, DisplayHour::MINUTE);
+        affManager->setValue(iValue % 100, DisplayHour::SECONDE);
+
+        //affManager->display(true, Afficheur::LAST_ELT);
+        iValue++;
+        FastLED.show();
+      }
+
+      else if (c == 'p')
+      {
+        affManager->setValue(iPoint, DisplayHour::POINT_HR);
+        affManager->setValue(iPoint, DisplayHour::POINT_MN);
+        affManager->handleMode();
+        iPoint = iPoint ^ 255;
+        FastLED.show();
+      }
+      else if (c == 'm')
+      {
+        affManager->setMode((DisplayBase::MODE_LED)(iMode % DisplayBase::MODE_LED_LAST));
+        iMode++;
+        FastLED.show();
+      }
+      else if (c == 'h')
+      {
+        smManager->m_mode = SettingManager::MODE_CLOCK;
+      }
+      else if (c == 'd')
+      {
+        affManager->setColorON(CRGB(0, 0, 125));
+        affManager->setColorOFF(CRGB(0, 0, 0));
+        affManager->setValue(DisplayDoubleDigit::DASH_BOTH, DisplayHour::HOUR);
+        affManager->setValue(DisplayDoubleDigit::DASH_BOTH, DisplayHour::MINUTE);
+        affManager->setValue(DisplayDoubleDigit::DASH_BOTH, DisplayHour::SECONDE);
+      }
+       else if (c == 's')
+      {
+        iSound++;
+        smManager->m_soundToPlay = iSound % 5;
+      }*/
+  }
+
+  if (bAuto)
+  {
+    if (dd.isDone())
+    {
+      dd.startDelay(500);
+      for (uint8_t i = 0; i < 130; i++)
+      {
+        leds[i] = cc[iColor % 8];
+      }
+      FastLED.show();
+      iColor++;
+    }
+  }
+}

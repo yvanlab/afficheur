@@ -20,6 +20,8 @@
 //#include <pixeltypes.h>
 #include "displayBase.h"
 
+
+
 class SettingManager : public BaseSettingManager
 {
 
@@ -33,6 +35,19 @@ public:
 		MODE_REBOOT = 4,
 		MODE_TEST = 5
 	};
+	typedef  uint8_t SOUND_TYPE;
+	const uint8_t NO_SOUND = 0;
+/*	enum SOUND_TYPE
+    {
+        NO_SOUND = 0,
+        SOUND_BIP = 1,
+        SOUND_END = 2,
+        SOUND_ALARM = 3,
+        SOUND_CAMEL = 4,
+        SOUND_LAST = 5
+    };
+*/
+
 	SettingManager(unsigned char pinLed);
 	virtual uint8_t readData();
 	virtual uint8_t writeData();
@@ -42,23 +57,8 @@ public:
 
 	String getClassName() { return "SettingManager"; }
 
-	//void sortPages();
-
 	String toString(boolean bJson);
 	String toStringCfg(boolean bJson);
-
-	/*uint32_t m_mainColor = 0xFF0000;
-	String m_mainAnnimation;
-
-	uint16_t m_dayIntensity;
-	uint16_t m_nightIntensity;
-	uint8_t m_nightHour;
-	uint8_t m_dayHour;
-	tmElements_t m_alarm;
-
-	DisplayBase::MODE_LED m_modeLed = DisplayBase::STATIC;
-	DisplayBase::MODE_LED m_modeFinCOUNTDOWNs = DisplayBase::PSYCHEDELIC;
-	DisplayBase::MODE_LED m_modeAfterReboot = DisplayBase::CLiGONTANT;*/
 
 	uint32_t m_rebootColorOn = 16777215;
 	uint32_t m_rebootColorOff = 0;
@@ -74,24 +74,25 @@ public:
 	uint8_t m_clockIntensityDay = 100;
 	uint8_t m_clockHourDay = 06;
 	uint8_t m_clockHourNight = 20;
-	uint8_t m_clockSoundHour = 0;
+	SOUND_TYPE m_clockSoundHour = NO_SOUND;
 
 	uint32_t m_countdownColorOn = 16711680;
 	uint32_t m_countdownColorOff = 20;
 	DisplayBase::MODE_LED m_countdownAnimation = DisplayBase::STATIC;
 	DisplayBase::MODE_LED m_countdownAnimationEnd = DisplayBase::PSYCHEDELIC;
 	DisplayBase::MODE_TRANSITION m_countdownTransition = DisplayBase::TRANSITION_NONE;
-	uint8_t m_countdownSoundStart = 0;
-	uint8_t m_countdownSoundEnd = 0;
+	SOUND_TYPE m_countdownSoundStart = NO_SOUND;
+	SOUND_TYPE m_countdownSoundEnd = NO_SOUND;
 	uint8_t m_countdownDurationEnd = 5;
 
 	String m_alarmTrigger = "15:00:00";
 	DisplayBase::MODE_LED m_alarmTriggerAnimation = DisplayBase::PSYCHEDELIC;
 	DisplayBase::MODE_TRANSITION m_alarmTriggerTransition = DisplayBase::TRANSITION_NONE;
-	uint8_t m_alarmTriggerSound = 0;
+	SOUND_TYPE m_alarmTriggerSound = NO_SOUND;
 	uint8_t m_alarmTriggerDuration = 20;
 
 	uint32_t m_countdownCpt = 0;
+	SOUND_TYPE  m_soundToPlay = NO_SOUND;
 	MODE_HORLOGE m_mode;
 };
 

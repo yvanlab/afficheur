@@ -166,7 +166,8 @@ void setData()
 	}
 	if ((str = wfManager->getServer()->arg("clockSoundHour")) != NULL)
 	{
-		smManager->m_clockSoundHour = str.toInt();
+		smManager->m_clockSoundHour = (SettingManager::SOUND_TYPE)str.toInt();
+		smManager->m_soundToPlay = smManager->m_clockSoundHour;
 	}
 
 	/*
@@ -206,11 +207,13 @@ void setData()
 	}
 	if ((str = wfManager->getServer()->arg("countdownSoundStart")) != NULL)
 	{
-		smManager->m_countdownSoundStart = str.toInt();
+		smManager->m_countdownSoundStart = (SettingManager::SOUND_TYPE)str.toInt();
+		smManager->m_soundToPlay = smManager->m_countdownSoundStart;
 	}
 	if ((str = wfManager->getServer()->arg("countdownSoundEnd")) != NULL)
 	{
-		smManager->m_countdownSoundEnd = str.toInt();
+		smManager->m_countdownSoundEnd = (SettingManager::SOUND_TYPE)str.toInt();
+		smManager->m_soundToPlay = smManager->m_countdownSoundEnd;
 	}
 	if ((str = wfManager->getServer()->arg("countdownDurationEnd")) != NULL)
 	{
@@ -222,16 +225,13 @@ void setData()
 	//dataPage();
 }
 
-/*void dataPage()
+void dataPage()
 {
 	digitalWrite(PIN_LED, LOW);
-	mpPages->stopTimer();
 
 	DEBUGLOG("dataPage");
 	delay(1000);
 	wfManager->loadFromSpiffs("/index.html");
 	//wfManager->getServer()->send_P ( 200, "text/html", HTML );
-
-	phPresence->forceStatus(true);
 	digitalWrite(PIN_LED, HIGH);
-}*/
+}

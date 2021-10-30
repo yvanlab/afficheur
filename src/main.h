@@ -9,6 +9,8 @@
 #include <myTimer.h>
 #include "settingManager.h"
 #include "networkUI.h"
+#include "horlogeManager.h"
+#include "soundManager.h"
 //#include "displayHour.h"
 //#include <FlashLED.h>
 

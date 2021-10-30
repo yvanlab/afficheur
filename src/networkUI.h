@@ -8,6 +8,7 @@ void setData();
 void saveConfiguration();
 void configPage();
 void OTAOnStart();
+void dataPage();
 
 
 

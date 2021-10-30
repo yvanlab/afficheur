@@ -45,7 +45,7 @@ public:
     {
         if (!myDelay.isDone()) return;
         myDelay.startDelay(1000);
-
+        //m_smManager->m_soundToPlay = 1;
         m_affManager->setMode(m_smManager->m_clockAnimation);
         m_affManager->setTransition(m_smManager->m_clockTransition);
         
