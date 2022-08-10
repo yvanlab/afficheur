@@ -34,7 +34,7 @@ public:
         m_id3 = new AudioFileSourceID3(m_file);
         m_out = new AudioOutputI2S(0, 1);
         m_mp3 = new AudioGeneratorMP3();
-        
+        m_out->SetOutputModeMono(true );
     }
 
     void begin() {

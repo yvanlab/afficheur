@@ -95,12 +95,7 @@ public:
     m_value = value;
   }
 
-  uint8_t getValueForAnnimation(uint8_t index)
-  {
-
-    if (m_transition != DisplayBase::TRANSITION_MOVE_UP || (m_iPos == 8) )
-      return 255;
-
+  uint8_t getValueForMOVE_UPAnnimation(uint8_t index){
     uint8_t iMaskTop = 0b11111111 >> (7 - m_iPos);    //0000 0001
     uint8_t iMaskBottom = 0b11111111 << (7 - m_iPos); //1000 0000
                                                       //DEBUGLOGF("handleMode [%d][%d]",iMask,iMask&0b111);
@@ -131,6 +126,55 @@ public:
       return (iMaskBottom >> 4) & 0b111;
     }
     return 255;
+  }
+
+
+uint8_t getValueForMOVE_UPAnnimationV2(uint8_t index){
+    uint8_t iMaskTop = 0b11111111 >> (7 - m_iPos);    //0000 0001
+    uint8_t iMaskBottom = 0b11111111 << (7 - m_iPos); //1000 0000
+                                                      //DEBUGLOGF("handleMode [%d][%d]",iMask,iMask&0b111);
+    switch (index)
+    {
+    case 0: //horizontal bottom
+      if (m_iPos==1||m_iPos==3||m_iPos==7)
+        return 255;
+      else
+        return 0;
+    case 1: //vertical left bottom
+      return (iMaskTop>>1) & 0b111;
+    case 2: ////vertical left top
+      return (iMaskTop >> 4) & 0b111;
+    case 3: //Hori top
+      if (iMaskTop & 0b10000000)
+        return 255;
+      else
+        return 0;
+    case 4: // vert rigth top
+      return (iMaskBottom >> 1) & 0b111;
+    case 5: // hori middle
+      if (iMaskTop & 0b1000)
+        return 255;
+      else
+        return 0;
+    case 6: // vert right bottom
+      return (iMaskBottom >> 4) & 0b111;
+    }
+    return 255;
+  }
+
+  
+  uint8_t getValueForAnnimation(uint8_t index)
+  {
+
+    if (m_transition != DisplayBase::TRANSITION_MOVE_UP || (m_iPos == 8) )
+      return 255;
+
+    uint8_t iMaskTop = 0b11111111 >> (7 - m_iPos);    //0000 0001
+    uint8_t iMaskBottom = 0b11111111 << (7 - m_iPos); //1000 0000
+                                                      //DEBUGLOGF("handleMode [%d][%d]",iMask,iMask&0b111);
+    
+    return getValueForMOVE_UPAnnimation(index);
+
   }
 
   virtual uint8_t handleMode()
